@@ -36,4 +36,12 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/verificar")
+    public ResponseEntity<String> verificarCorreo(@RequestParam String token) {
+
+        authService.verificarCorreo(token);
+
+        return ResponseEntity.ok("Correo verificado correctamente");
+    }
+
 }

@@ -34,7 +34,6 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, unique = true)
     private String correo;
 
-    @Column(length = 8)
     private String contrasena;
 
     @Enumerated(EnumType.STRING)

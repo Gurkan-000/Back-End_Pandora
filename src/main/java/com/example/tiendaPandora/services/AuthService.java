@@ -3,10 +3,12 @@ package com.example.tiendaPandora.services;
 import com.example.tiendaPandora.dtos.request.RequestAuth;
 import com.example.tiendaPandora.dtos.request.RequestRegister;
 import com.example.tiendaPandora.dtos.response.ResponseAuth;
+import com.example.tiendaPandora.entities.EmailTokenVerificacion;
 import com.example.tiendaPandora.entities.Usuario;
-import com.example.tiendaPandora.entities.enums.Rol;
 import com.example.tiendaPandora.exceptions.EntidadNoEncontradaException;
+import com.example.tiendaPandora.mappers.MapperEmailToken;
 import com.example.tiendaPandora.mappers.MapperUsuario;
+import com.example.tiendaPandora.repositories.EmailTokenVerificacionRepository;
 import com.example.tiendaPandora.repositories.UsuarioRepository;
 import com.example.tiendaPandora.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,29 +20,36 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final EmailTokenVerificacionRepository emailTokenRepository;
+
     private final TokenBlackListService tokenBlackListService;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
     private final ServiceCookie serviceCookie;
 
-    public AuthService(UsuarioRepository usuarioRepository, TokenBlackListService tokenBlackListService, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceCookie serviceCookie) {
+    public AuthService(UsuarioRepository usuarioRepository, EmailTokenVerificacionRepository emailTokenRepository, TokenBlackListService tokenBlackListService, JwtService jwtService, EmailService emailService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceCookie serviceCookie) {
         this.usuarioRepository = usuarioRepository;
+        this.emailTokenRepository = emailTokenRepository;
         this.tokenBlackListService = tokenBlackListService;
         this.jwtService = jwtService;
+        this.emailService = emailService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.serviceCookie = serviceCookie;
     }
 
     public ResponseAuth iniciarSesion(RequestAuth requestAuth, HttpServletResponse response) {
-
         Usuario usuario = usuarioRepository.findByCorreo(requestAuth.getCorreo())
                 .orElseThrow(() -> new EntidadNoEncontradaException("Usuario no encontrado"));
 
@@ -62,7 +71,6 @@ public class AuthService {
 
     @Transactional
     public void registrar(RequestRegister requestRegister) {
-
         if (usuarioRepository.findByCorreo(requestRegister.getCorreo()).isPresent()) {
             throw new IllegalArgumentException("El correo ya está registrado");
         }
@@ -70,6 +78,37 @@ public class AuthService {
         Usuario usuario = MapperUsuario.toEntity(requestRegister, passwordEncoder.encode(requestRegister.getContrasena()));
 
         usuarioRepository.save(usuario);
+
+        String token = UUID.randomUUID().toString();
+
+        EmailTokenVerificacion tokenVerificacion = MapperEmailToken.toEntity(token, usuario);
+
+        emailTokenRepository.save(tokenVerificacion);
+
+        emailService.enviarCorreoVerificacion(
+                usuario.getCorreo(),
+                token
+        );
+    }
+
+    @Transactional
+    public void verificarCorreo(String token) {
+
+        EmailTokenVerificacion tokenVerificacion =
+                emailTokenRepository.findByToken(token)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException("Token no encontrado"));
+
+        if (tokenVerificacion.getFechaExpiracion()
+                .isBefore(LocalDateTime.now())) {
+
+            throw new IllegalArgumentException("El token ha expirado");
+        }
+
+        Usuario usuario = tokenVerificacion.getUsuario();
+
+        usuario.setCorreoVerificado(true);
+
     }
 
 }

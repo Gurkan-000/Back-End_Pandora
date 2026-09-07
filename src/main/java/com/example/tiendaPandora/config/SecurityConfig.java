@@ -46,14 +46,21 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/iniciarSesion","/api/mensajePublico")
+                        .ignoringRequestMatchers("/api/auth/iniciarSesion",
+                                "/api/auth/registrar",
+                                "/api/auth/verificar",
+                                "/",
+                                "/api/mensajePublico")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/").permitAll()
                         .requestMatchers("/api/auth/iniciarSesion").permitAll()
+                        .requestMatchers("/api/auth/verificar").permitAll()
+                        .requestMatchers("/api/auth/registrar").permitAll()
                         .requestMatchers("/api/mensajePublico").permitAll()
                         .requestMatchers("/api/mensajeSeguro").hasRole("CLIENTE")
                         .anyRequest().authenticated()
