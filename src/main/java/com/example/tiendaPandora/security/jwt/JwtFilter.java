@@ -2,8 +2,10 @@ package com.example.tiendaPandora.security.jwt;
 
 import java.io.IOException;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.util.WebUtils;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -38,49 +41,29 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
 
-            String authHeader = request.getHeader("Authorization");
+            String username = null;
+            String jwt = getJWT(request);
 
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                filterChain.doFilter(request, response);
-                return;
+            if(jwt != null) {
+                username = jwtService.extractUsername(jwt);
             }
 
-            String jwt = authHeader.substring(7);
+            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            String username = jwtService.extractUsername(jwt);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (username == null) {
-                filterChain.doFilter(request, response);
-                return;
+                if(jwtService.isTokenValid(jwt, userDetails) && !serviceBlackList.esTokenInvalido(jwt)) {
+
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails,
+                                    null,
+                                    userDetails.getAuthorities());
+
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+
             }
-
-            if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            if (!jwtService.isTokenValid(jwt, userDetails)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            if (serviceBlackList.esTokenInvalido(jwt)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            UsernamePasswordAuthenticationToken authToken
-                    = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
-
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authToken);
 
             filterChain.doFilter(request, response);
 
@@ -90,5 +73,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     }
 
+    private String getJWT(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        return cookie != null ? cookie.getValue() : null;
+    }
 
 }

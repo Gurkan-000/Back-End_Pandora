@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResponseAuth {
 
-    private String token;
+    private String rol;
 
 }

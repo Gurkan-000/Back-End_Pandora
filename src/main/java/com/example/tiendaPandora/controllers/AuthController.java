@@ -4,6 +4,7 @@ import com.example.tiendaPandora.dtos.request.RequestAuth;
 import com.example.tiendaPandora.dtos.request.RequestRegister;
 import com.example.tiendaPandora.dtos.response.ResponseAuth;
 import com.example.tiendaPandora.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +20,16 @@ public class AuthController {
     }
 
     @PostMapping("/iniciarSesion")
-    public ResponseEntity<ResponseAuth> iniciarSesion(@Valid @RequestBody RequestAuth requestAuth) {
+    public ResponseEntity<ResponseAuth> iniciarSesion(@Valid @RequestBody RequestAuth requestAuth,
+                                                      HttpServletResponse response) {
 
-        ResponseAuth responseAuth = authService.iniciarSesion(requestAuth);
+        ResponseAuth responseAuth = authService.iniciarSesion(requestAuth, response);
 
         return ResponseEntity.ok(responseAuth);
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity<Void> iniciarSesion(@Valid @RequestBody RequestRegister requestRegister) {
+    public ResponseEntity<Void> registrar(@Valid @RequestBody RequestRegister requestRegister) {
 
         authService.registrar(requestRegister);
 

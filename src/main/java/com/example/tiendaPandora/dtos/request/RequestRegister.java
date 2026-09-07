@@ -28,7 +28,4 @@ public class RequestRegister {
     @NotBlank(message="Contraseña esta vacio")
     private String contrasena;
 
-    @NotBlank(message="Rol esta vacio")
-    private String rol;
-
 }

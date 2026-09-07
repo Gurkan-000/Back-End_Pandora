@@ -7,12 +7,15 @@ import com.example.tiendaPandora.security.jwt.JwtService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Duration;
 
 @Component
 public class OAuth2LoginSuccessHandler  implements AuthenticationSuccessHandler {
@@ -58,12 +61,16 @@ public class OAuth2LoginSuccessHandler  implements AuthenticationSuccessHandler 
 
         String token = jwtService.generateToken(usuario);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(false) // En localhost/HTTP. En producción será true.
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(Duration.ofHours(1))
+                .build();
 
-        response.getWriter().write(
-                "{\"token\":\"" + token + "\"}"
-        );
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
+        response.sendRedirect("http://localhost:5500/pagina1.html");
     }
 }

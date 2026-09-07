@@ -43,6 +43,8 @@ public class Usuario implements UserDetails {
     @Column(unique = true)
     private String googleId;
 
+    private boolean correoVerificado;
+
     @Override
     public @NullMarked Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));

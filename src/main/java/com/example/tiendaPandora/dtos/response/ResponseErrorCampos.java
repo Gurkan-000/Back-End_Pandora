@@ -14,7 +14,7 @@ import lombok.Setter;
 @Builder
 public class ResponseErrorCampos {
 
-    private Integer CodigoHttp;
+    private Integer codigoHttp;
 
     private List<String> mensajes;
 
