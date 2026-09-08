@@ -6,11 +6,15 @@ import com.example.tiendaPandora.dtos.response.ResponseAuth;
 import com.example.tiendaPandora.entities.EmailTokenVerificacion;
 import com.example.tiendaPandora.entities.Usuario;
 import com.example.tiendaPandora.exceptions.EntidadNoEncontradaException;
+import com.example.tiendaPandora.exceptions.ReglaDeNegocioException;
+import com.example.tiendaPandora.exceptions.TokenException;
 import com.example.tiendaPandora.mappers.MapperEmailToken;
 import com.example.tiendaPandora.mappers.MapperUsuario;
 import com.example.tiendaPandora.repositories.EmailTokenVerificacionRepository;
 import com.example.tiendaPandora.repositories.UsuarioRepository;
 import com.example.tiendaPandora.security.jwt.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.WebUtils;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -64,7 +69,7 @@ public class AuthService {
 
         String jwt = jwtService.generateToken(usuario);
 
-        serviceCookie.addHttpOnlyCookie("jwt", jwt, 7*24*60*60, response);
+        serviceCookie.addHttpOnlyCookie("jwt", jwt, 24 * 60 * 60, response);
 
         return new ResponseAuth(usuario.getRol().toString());
     }
@@ -72,7 +77,7 @@ public class AuthService {
     @Transactional
     public void registrar(RequestRegister requestRegister) {
         if (usuarioRepository.findByCorreo(requestRegister.getCorreo()).isPresent()) {
-            throw new IllegalArgumentException("El correo ya está registrado");
+            throw new ReglaDeNegocioException("El correo ya está registrado");
         }
 
         Usuario usuario = MapperUsuario.toEntity(requestRegister, passwordEncoder.encode(requestRegister.getContrasena()));
@@ -94,21 +99,38 @@ public class AuthService {
     @Transactional
     public void verificarCorreo(String token) {
 
-        EmailTokenVerificacion tokenVerificacion =
-                emailTokenRepository.findByToken(token)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException("Token no encontrado"));
+        EmailTokenVerificacion tokenVerificacion = emailTokenRepository.findByToken(token)
+                        .orElseThrow(() -> new TokenException("Token no encontrado"));
 
         if (tokenVerificacion.getFechaExpiracion()
                 .isBefore(LocalDateTime.now())) {
 
-            throw new IllegalArgumentException("El token ha expirado");
+            throw new TokenException("El token ha expirado");
         }
 
         Usuario usuario = tokenVerificacion.getUsuario();
 
         usuario.setCorreoVerificado(true);
 
+    }
+
+    @Transactional
+    public void cerrarSesion(HttpServletRequest request, HttpServletResponse response) {
+
+        String token = getJWT(request);
+
+        if(token == null) {
+            throw new TokenException("El token ya no existe en la cookie");
+        }
+
+        tokenBlackListService.revocarToken(token);
+        serviceCookie.deleteCookie("jwt", response);
+
+    }
+
+    private String getJWT(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        return cookie != null ? cookie.getValue() : null;
     }
 
 }

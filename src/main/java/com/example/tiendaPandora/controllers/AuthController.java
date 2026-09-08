@@ -4,6 +4,7 @@ import com.example.tiendaPandora.dtos.request.RequestAuth;
 import com.example.tiendaPandora.dtos.request.RequestRegister;
 import com.example.tiendaPandora.dtos.response.ResponseAuth;
 import com.example.tiendaPandora.services.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,15 @@ public class AuthController {
         ResponseAuth responseAuth = authService.iniciarSesion(requestAuth, response);
 
         return ResponseEntity.ok(responseAuth);
+    }
+
+    @PostMapping("/cerrarSesion")
+    public ResponseEntity<String> cerrarSesion(HttpServletRequest request,
+                                               HttpServletResponse response) {
+
+        authService.cerrarSesion(request, response);
+
+        return ResponseEntity.ok("Se cerro sesion correctamente");
     }
 
     @PostMapping("/registrar")

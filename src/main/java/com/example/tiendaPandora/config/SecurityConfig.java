@@ -1,7 +1,7 @@
 package com.example.tiendaPandora.config;
 
+import com.example.tiendaPandora.security.jwt.JwtEntryPoint;
 import com.example.tiendaPandora.security.jwt.JwtFilter;
-import com.example.tiendaPandora.security.oauth.OAuth2LoginSuccessHandler;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,11 +29,9 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
-    public SecurityConfig(JwtFilter jwtFilter, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
-        this.jwtFilter = jwtFilter;
-        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;;
     }
 
     @Bean
@@ -49,7 +47,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/api/auth/iniciarSesion",
                                 "/api/auth/registrar",
                                 "/api/auth/verificar",
-                                "/",
+                                "/api/auth/cerrarSesion",
                                 "/api/mensajePublico")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
@@ -57,23 +55,26 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/").permitAll()
                         .requestMatchers("/api/auth/iniciarSesion").permitAll()
+                        .requestMatchers("/api/auth/cerrarSesion").permitAll()
                         .requestMatchers("/api/auth/verificar").permitAll()
                         .requestMatchers("/api/auth/registrar").permitAll()
                         .requestMatchers("/api/mensajePublico").permitAll()
                         .requestMatchers("/api/mensajeSeguro").hasRole("CLIENTE")
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(oauth ->
-                        oauth.successHandler(oAuth2LoginSuccessHandler)
-                )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return  http.build();
+    }
+
+    @Bean
+    public JwtEntryPoint jwtEntryPoint() {
+        return new JwtEntryPoint();
     }
 
     @Bean

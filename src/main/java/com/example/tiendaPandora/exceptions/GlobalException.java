@@ -36,6 +36,17 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseError);
     }
 
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<ResponseError> tokenException(TokenException e){
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(401)
+                .mensaje(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseError);
+    }
+
     @ExceptionHandler(ReglaDeNegocioException.class)
     public ResponseEntity<ResponseError> reglaDeNegocioException(ReglaDeNegocioException e){
 
