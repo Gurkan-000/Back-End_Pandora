@@ -11,6 +11,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     Optional<Usuario> findByCorreo(String username) throws UsernameNotFoundException;
 
-
-
 }

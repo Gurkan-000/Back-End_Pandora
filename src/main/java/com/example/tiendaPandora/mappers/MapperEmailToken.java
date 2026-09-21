@@ -10,7 +10,7 @@ public class MapperEmailToken {
     public static EmailTokenVerificacion toEntity(String token, Usuario usuario){
         return EmailTokenVerificacion.builder()
                 .token(token)
-                .fechaExpiracion(LocalDateTime.now().plusHours(24))
+                .expiracion(LocalDateTime.now().plusHours(24))
                 .usuario(usuario)
                 .build();
     }

@@ -34,15 +34,18 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, unique = true)
     private String correo;
 
+    @Column(nullable = false)
     private String contrasena;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Rol rol;
 
     @Column(unique = true)
-    private String googleId;
+    private String idGoogle;
 
-    private boolean correoVerificado;
+    @Column(nullable = false)
+    private Boolean correoVerificado;
 
     @Override
     public @NullMarked Collection<? extends GrantedAuthority> getAuthorities() {

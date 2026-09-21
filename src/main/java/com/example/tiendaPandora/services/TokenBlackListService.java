@@ -1,5 +1,6 @@
 package com.example.tiendaPandora.services;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import com.example.tiendaPandora.repositories.TokenBlackListRepository;
@@ -25,7 +26,7 @@ public class TokenBlackListService {
 
         TokenBlackList tokenBlacklist = TokenBlackList.builder()
                 .token(token)
-                .fechaExpiracion(fechaExpiracion)
+                .expiracion(fechaExpiracion)
                 .build();
 
         tokenBlackListRepository.save(tokenBlacklist);

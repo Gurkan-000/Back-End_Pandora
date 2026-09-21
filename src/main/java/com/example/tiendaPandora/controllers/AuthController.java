@@ -54,4 +54,14 @@ public class AuthController {
         return ResponseEntity.ok("Correo verificado correctamente");
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<Void> refresh(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        authService.refresh(request, response);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

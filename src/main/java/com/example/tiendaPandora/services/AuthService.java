@@ -35,20 +35,28 @@ public class AuthService {
     private final EmailTokenVerificacionRepository emailTokenRepository;
 
     private final TokenBlackListService tokenBlackListService;
-    private final JwtService jwtService;
     private final EmailService emailService;
+    private final TokenService tokenService;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
-    private final ServiceCookie serviceCookie;
+    private final CookieService serviceCookie;
 
-    public AuthService(UsuarioRepository usuarioRepository, EmailTokenVerificacionRepository emailTokenRepository, TokenBlackListService tokenBlackListService, JwtService jwtService, EmailService emailService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, ServiceCookie serviceCookie) {
+    public AuthService(UsuarioRepository usuarioRepository,
+                       EmailTokenVerificacionRepository emailTokenRepository,
+                       TokenBlackListService tokenBlackListService,
+                       EmailService emailService,
+                       TokenService tokenService,
+                       AuthenticationManager authenticationManager,
+                       PasswordEncoder passwordEncoder,
+                       CookieService serviceCookie) {
+
         this.usuarioRepository = usuarioRepository;
         this.emailTokenRepository = emailTokenRepository;
         this.tokenBlackListService = tokenBlackListService;
-        this.jwtService = jwtService;
         this.emailService = emailService;
+        this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.serviceCookie = serviceCookie;
@@ -58,7 +66,7 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByCorreo(requestAuth.getCorreo())
                 .orElseThrow(() -> new EntidadNoEncontradaException("Usuario no encontrado"));
 
-        if(!usuario.isCorreoVerificado()){
+        if(!usuario.getCorreoVerificado()){
             throw new BadCredentialsException("El correo no fue verificado");
         }
 
@@ -67,11 +75,33 @@ public class AuthService {
                         requestAuth.getCorreo(),
                         requestAuth.getContrasena()));
 
-        String jwt = jwtService.generateToken(usuario);
+        String accessToken = tokenService.generateAccessToken(usuario);
+        String refreshToken = tokenService.generateRefreshToken(usuario);
 
-        serviceCookie.addHttpOnlyCookie("jwt", jwt, 24 * 60 * 60, response);
+        serviceCookie.addHttpOnlyCookie("accessToken", accessToken, 10, response);
+        serviceCookie.addHttpOnlyCookie("refreshToken", refreshToken, 7 * 24 * 60 * 60, response);
 
         return new ResponseAuth(usuario.getRol().toString());
+    }
+
+    @Transactional
+    public void cerrarSesion(HttpServletRequest request, HttpServletResponse response) {
+
+        String accessToken = serviceCookie.getCookie(request, "accessToken");
+        String refreshToken = serviceCookie.getCookie(request, "refreshToken");
+
+        if (accessToken != null) {
+            tokenBlackListService.revocarToken(accessToken);
+        }
+
+        if (refreshToken != null) {
+            tokenService.revocar(refreshToken);
+        }
+
+        tokenBlackListService.revocarToken(accessToken);
+
+        serviceCookie.deleteCookie("accessToken", response);
+        serviceCookie.deleteCookie("refreshToken", response);
     }
 
     @Transactional
@@ -102,8 +132,7 @@ public class AuthService {
         EmailTokenVerificacion tokenVerificacion = emailTokenRepository.findByToken(token)
                         .orElseThrow(() -> new TokenException("Token no encontrado"));
 
-        if (tokenVerificacion.getFechaExpiracion()
-                .isBefore(LocalDateTime.now())) {
+        if (tokenVerificacion.getExpiracion().isBefore(LocalDateTime.now())) {
 
             throw new TokenException("El token ha expirado");
         }
@@ -114,23 +143,18 @@ public class AuthService {
 
     }
 
-    @Transactional
-    public void cerrarSesion(HttpServletRequest request, HttpServletResponse response) {
+    public void refresh(HttpServletRequest request, HttpServletResponse response) {
 
-        String token = getJWT(request);
+        String refreshToken = serviceCookie.getCookie(request, "refreshToken");
 
-        if(token == null) {
-            throw new TokenException("El token ya no existe en la cookie");
+        if (refreshToken == null) {
+            throw new TokenException("Refresh token no encontrado");
         }
 
-        tokenBlackListService.revocarToken(token);
-        serviceCookie.deleteCookie("jwt", response);
+        Usuario usuario = tokenService.validar(refreshToken);
 
+        String accessToken = tokenService.generateAccessToken(usuario);
+
+        serviceCookie.addHttpOnlyCookie("accessToken", accessToken, 10, response);
     }
-
-    private String getJWT(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, "jwt");
-        return cookie != null ? cookie.getValue() : null;
-    }
-
 }

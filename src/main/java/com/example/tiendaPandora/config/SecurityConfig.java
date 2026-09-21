@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 "/api/auth/registrar",
                                 "/api/auth/verificar",
                                 "/api/auth/cerrarSesion",
+                                "/api/auth/refresh",
                                 "/api/mensajePublico")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
@@ -55,10 +56,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/auth/iniciarSesion").permitAll()
-                        .requestMatchers("/api/auth/cerrarSesion").permitAll()
-                        .requestMatchers("/api/auth/verificar").permitAll()
-                        .requestMatchers("/api/auth/registrar").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/mensajePublico").permitAll()
                         .requestMatchers("/api/mensajeSeguro").hasRole("CLIENTE")
                         .anyRequest().authenticated()

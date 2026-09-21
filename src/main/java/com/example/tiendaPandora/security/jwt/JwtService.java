@@ -2,9 +2,11 @@ package com.example.tiendaPandora.security.jwt;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -27,25 +29,15 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(Usuario usuario) {
-
-        Map<String,Object> claims = new HashMap<>();
-
-        claims.put("nombre", usuario.getNombre());
-        claims.put("rol", usuario.getRol());
-
-        return generateToken(claims, usuario);
-    }
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long number, TemporalUnit temporalUnit) {
         Instant now = Instant.now();
 
         Date issuedAt = Date.from(now);
-        Date expiration = Date.from(now.plus(1, ChronoUnit.DAYS));
+        Date expiration = Date.from(now.plus(number, temporalUnit));
 
         return Jwts.builder()
                 .claims(extraClaims)
+                .id(UUID.randomUUID().toString())
                 .subject(userDetails.getUsername())
                 .issuedAt(issuedAt)
                 .expiration(expiration)
@@ -60,6 +52,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractJti(String token) {
+        return extractClaim(token, Claims::getId);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

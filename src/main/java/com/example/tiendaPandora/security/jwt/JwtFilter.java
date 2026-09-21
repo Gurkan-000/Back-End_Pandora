@@ -2,6 +2,7 @@ package com.example.tiendaPandora.security.jwt;
 
 import java.io.IOException;
 
+import com.example.tiendaPandora.services.CookieService;
 import jakarta.servlet.http.Cookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,14 +27,16 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final TokenBlackListService serviceBlackList;
+    private final CookieService cookieService;
 
     public JwtFilter(JwtService jwtService,
                      CustomUserDetailsService userDetailsService,
-                     TokenBlackListService serviceBlackList) {
+                     TokenBlackListService serviceBlackList, CookieService cookieService) {
 
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.serviceBlackList = serviceBlackList;
+        this.cookieService = cookieService;
     }
 
     @Override
@@ -42,17 +45,17 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
 
             String username = null;
-            String jwt = getJWT(request);
+            String accessToken = cookieService.getCookie(request, "accessToken");
 
-            if(jwt != null) {
-                username = jwtService.extractUsername(jwt);
+            if(accessToken != null) {
+                username = jwtService.extractUsername(accessToken);
             }
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if(jwtService.isTokenValid(jwt, userDetails) && !serviceBlackList.esTokenInvalido(jwt)) {
+                if(jwtService.isTokenValid(accessToken, userDetails) && !serviceBlackList.esTokenInvalido(accessToken)) {
 
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails,
@@ -71,11 +74,6 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(401);
         }
 
-    }
-
-    private String getJWT(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, "jwt");
-        return cookie != null ? cookie.getValue() : null;
     }
 
 }
