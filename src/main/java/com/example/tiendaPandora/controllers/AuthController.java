@@ -7,18 +7,16 @@ import com.example.tiendaPandora.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/iniciarSesion")
     public ResponseEntity<ResponseAuth> iniciarSesion(@Valid @RequestBody RequestAuth requestAuth,
@@ -47,9 +45,9 @@ public class AuthController {
     }
 
     @GetMapping("/verificar")
-    public ResponseEntity<String> verificarCorreo(@RequestParam String token) {
+    public ResponseEntity<String> verificarCorreo(@RequestParam String correo) {
 
-        authService.verificarCorreo(token);
+        authService.verificarCorreo(correo);
 
         return ResponseEntity.ok("Correo verificado correctamente");
     }

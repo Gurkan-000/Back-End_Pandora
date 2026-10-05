@@ -3,6 +3,7 @@ package com.example.tiendaPandora.config;
 import com.example.tiendaPandora.security.jwt.JwtEntryPoint;
 import com.example.tiendaPandora.security.jwt.JwtFilter;
 import jakarta.servlet.DispatcherType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,13 +27,10 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-
-    public SecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;;
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -44,21 +42,15 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/iniciarSesion",
-                                "/api/auth/registrar",
-                                "/api/auth/verificar",
-                                "/api/auth/cerrarSesion",
-                                "/api/auth/refresh",
-                                "/api/mensajePublico")
+                        .ignoringRequestMatchers("/api/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/mensajePublico").permitAll()
                         .requestMatchers("/api/mensajeSeguro").hasRole("CLIENTE")
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))

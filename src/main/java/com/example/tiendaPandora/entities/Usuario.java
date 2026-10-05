@@ -41,9 +41,6 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Rol rol;
 
-    @Column(unique = true)
-    private String idGoogle;
-
     @Column(nullable = false)
     private Boolean correoVerificado;
 
