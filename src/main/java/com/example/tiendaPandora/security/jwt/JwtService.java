@@ -29,7 +29,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long number, TemporalUnit temporalUnit) {
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, String jti, long number, TemporalUnit temporalUnit) {
         Instant now = Instant.now();
 
         Date issuedAt = Date.from(now);
@@ -37,7 +37,7 @@ public class JwtService {
 
         return Jwts.builder()
                 .claims(extraClaims)
-                .id(UUID.randomUUID().toString())
+                .id(jti)
                 .subject(userDetails.getUsername())
                 .issuedAt(issuedAt)
                 .expiration(expiration)

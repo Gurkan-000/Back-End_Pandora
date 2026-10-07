@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -83,5 +85,38 @@ public class GlobalException {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseErrorCampos);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResponseError> illegalArgumentException(IllegalArgumentException e){
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(400)
+                .mensaje(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
+    }
+
+    @ExceptionHandler(FileAlreadyExistsException.class)
+    public ResponseEntity<ResponseError> fileAlreadyExistsException(FileAlreadyExistsException e) {
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(409)
+                .mensaje("El archivo ya existe.")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseError);
+    }
+
+    @ExceptionHandler(NoSuchFileException.class)
+    public ResponseEntity<ResponseError> noSuchFileException(NoSuchFileException e) {
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(404)
+                .mensaje("La imagen no existe.")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseError);
+    }
+
 
 }

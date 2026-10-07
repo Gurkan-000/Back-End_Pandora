@@ -14,6 +14,13 @@ public interface VarianteAtributoRepository extends JpaRepository<VarianteAtribu
     boolean existsById(VarianteAtributoId id);
 
     @Query("""
+        SELECT COUNT(DISTINCT va.atributo.idAtributo)
+        FROM ValorAtributo va
+        WHERE va.idValorAtributo IN :idsValores
+    """)
+    long contarAtributosDistintos(@Param("idsValores") Set<UUID> idsValores);
+
+    @Query("""
         SELECT COUNT(vp) > 0
         FROM VarianteProducto vp
         WHERE vp.producto.idProducto = :idProducto
@@ -31,6 +38,7 @@ public interface VarianteAtributoRepository extends JpaRepository<VarianteAtribu
     );
 
 
+    Set<UUID> id(VarianteAtributoId id);
 }
 
 

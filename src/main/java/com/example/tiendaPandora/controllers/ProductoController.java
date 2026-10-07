@@ -3,6 +3,7 @@ package com.example.tiendaPandora.controllers;
 import com.example.tiendaPandora.dtos.request.RequestProducto;
 import com.example.tiendaPandora.dtos.response.ResponseAtributo;
 import com.example.tiendaPandora.dtos.response.ResponseProducto;
+import com.example.tiendaPandora.dtos.response.ResponseVarianteProducto;
 import com.example.tiendaPandora.services.ProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,14 @@ public class ProductoController {
     }
 
     @GetMapping("/listar/{idProducto}/atributos")
-    public ResponseEntity<Set<ResponseAtributo>> listarAtributosPorIdProduco(@PathVariable UUID idProducto) {
+    public ResponseEntity<Set<ResponseAtributo>> listarAtributosPorIdProducto(@PathVariable UUID idProducto) {
         Set<ResponseAtributo> response = productoService.listarAtributosPorIdProducto(idProducto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/listar/{idProducto}/variantes")
+    public ResponseEntity<List<ResponseVarianteProducto>> listarVariantesPorIdProducto(@PathVariable UUID idProducto) {
+        List<ResponseVarianteProducto> response = productoService.listarVariantesPorIdProducto(idProducto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

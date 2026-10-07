@@ -29,8 +29,8 @@ public class TokenService {
         claims.put("nombre", usuario.getNombre());
         claims.put("rol", usuario.getRol());
 
-        String token = jwtService.generateToken(claims, usuario, 30, ChronoUnit.MINUTES);
         String jti = UUID.randomUUID().toString();
+        String token = jwtService.generateToken(claims, usuario, jti, 30, ChronoUnit.MINUTES);
 
         Token accessToken = Token.builder()
                 .token(token)
@@ -49,8 +49,8 @@ public class TokenService {
     public String generateRefreshToken(Usuario usuario) {
         Map<String,Object> claims = new HashMap<>();
 
-        String token = jwtService.generateToken(claims, usuario, 7, ChronoUnit.DAYS);
-        String jti = jwtService.extractJti(token);
+        String jti = UUID.randomUUID().toString();
+        String token = jwtService.generateToken(claims, usuario, jti, 7, ChronoUnit.DAYS);
 
         Token refreshToken = Token.builder()
                 .token(token)
@@ -95,12 +95,18 @@ public class TokenService {
         return entityToken.getUsuario();
     }
 
-    public boolean esTokenRevocado(String token){
+    public boolean esTokenRevocado(String token) {
+
         String jti = jwtService.extractJti(token);
+
+        System.out.println("JTI DEL JWT: " + jti);
+
         Token entityToken = tokenRepository
                 .findByJti(jti)
                 .orElseThrow(() ->
                         new TokenException("Token no encontrado"));
+
+        System.out.println("JTI BD: " + entityToken.getJti());
 
         return entityToken.getRevocado();
     }

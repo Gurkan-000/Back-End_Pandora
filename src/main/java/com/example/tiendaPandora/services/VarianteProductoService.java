@@ -53,6 +53,10 @@ public class VarianteProductoService {
 
         producto.addVariante(varianteProducto);
 
+        if(validarCombinacionExistente(idProducto, requestVarianteProducto)){
+            throw new ReglaDeNegocioException("Combinacion de atributos existente");
+        }
+
         for(UUID idValorAtributo : requestVarianteProducto.getIdValorAtributos()){
 
             ValorAtributo valorAtributo = valorAtributoService.buscarValorAtributo(idValorAtributo);
@@ -80,13 +84,18 @@ public class VarianteProductoService {
         varianteProducto.setPrecio(requestVarianteProducto.getPrecio());
         varianteProducto.setStock(requestVarianteProducto.getStock());
 
-        for(UUID idValorAtributo : requestVarianteProducto.getIdValorAtributos()){
-            ValorAtributo valorAtributo = valorAtributoService.buscarValorAtributo(idValorAtributo);
+        if(!validarCombinacionExistente(idProducto, requestVarianteProducto)){
+            varianteProducto.getVariantesAtributos().clear();
+            varianteProductoRepository.flush();
 
-            VarianteAtributo varianteAtributo = new  VarianteAtributo();
+            for(UUID idValorAtributo : requestVarianteProducto.getIdValorAtributos()){
+                ValorAtributo valorAtributo = valorAtributoService.buscarValorAtributo(idValorAtributo);
 
-            valorAtributo.addVarianteAtributo(varianteAtributo);
-            varianteProducto.addVarianteAtributo(varianteAtributo);
+                VarianteAtributo varianteAtributo = new  VarianteAtributo();
+
+                valorAtributo.addVarianteAtributo(varianteAtributo);
+                varianteProducto.addVarianteAtributo(varianteAtributo);
+            }
         }
 
         varianteProductoRepository.save(varianteProducto);
@@ -104,10 +113,21 @@ public class VarianteProductoService {
     }
 
     private void validarVariantesDelProducto(Producto producto, RequestVarianteProducto requestVarianteProducto){
+
         Set<UUID> idsValores = new HashSet<>(requestVarianteProducto.getIdValorAtributos());
 
         if (idsValores.size() != requestVarianteProducto.getIdValorAtributos().size()) {
-            throw new ReglaDeNegocioException("No se pueden repetir valores de atributo");
+            throw new ReglaDeNegocioException(
+                    "No se pueden repetir valores de atributo"
+            );
+        }
+
+        long cantidadAtributosDistintos = varianteAtributoRepository.contarAtributosDistintos(idsValores);
+
+        if (cantidadAtributosDistintos != idsValores.size()) {
+            throw new ReglaDeNegocioException(
+                    "No se pueden enviar dos valores del mismo atributo"
+            );
         }
 
         Set<UUID> atributosProducto = productoService.obtenerIdsAtributosDelProducto(producto.getIdProducto());
@@ -120,12 +140,13 @@ public class VarianteProductoService {
             );
         }
 
-        if(varianteAtributoRepository.existeCombinacion(producto.getIdProducto(),
-                idsValores,
-                idsValores.size())){
+    }
 
-            throw new ReglaDeNegocioException("Combinacion ya existente");
-        }
+    private boolean validarCombinacionExistente(UUID idProducto, RequestVarianteProducto requestVarianteProducto){
+        Set<UUID> idsValores = requestVarianteProducto.getIdValorAtributos();
+        return varianteAtributoRepository.existeCombinacion(idProducto,
+                idsValores,
+                idsValores.size());
     }
 
 }

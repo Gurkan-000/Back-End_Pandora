@@ -13,7 +13,7 @@ public class EmailService {
 
     public void enviarCorreoVerificacion(String correo) {
 
-        String enlace = "http://localhost:8081/api/auth/verificar?correo=" + correo;
+        String enlace = "http://localhost:8080/api/auth/verificar?correo=" + correo;
 
         SimpleMailMessage mensaje = new SimpleMailMessage();
 

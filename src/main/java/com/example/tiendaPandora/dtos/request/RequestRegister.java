@@ -18,9 +18,6 @@ public class RequestRegister {
     @NotBlank(message="Apellido esta vacio")
     private String apellido;
 
-    @NotBlank(message="Usuario esta vacio")
-    private String nombreUsuario;
-
     @Email(message = "Correo invalido")
     @NotBlank(message = "Correo esta vacio")
     private String correo;

@@ -6,6 +6,7 @@ import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -42,15 +43,45 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")
+                        .ignoringRequestMatchers("/api/auth/**",
+                                "/api/producto/{idProducto}",
+                                "/api/producto/listar/**",
+                                "/api/atributo/{idAtributo}",
+                                "/api/atributo/listar/",
+                                "/api/categoria/{idCategoria}",
+                                "/api/categoria/listar",
+                                "/api/marca/{idMarca}",
+                                "/api/marca/listar",
+                                "/api/subcategoria/{idSubCategoria}",
+                                "/api/subcategoria/listar",
+                                "/api/valor-atributo/{idValorAtributo}",
+                                "/api/valor-atributo/listar")
+                        .ignoringRequestMatchers(request ->
+                                HttpMethod.GET.matches(request.getMethod())
+                                        && request.getRequestURI().startsWith("/api/imagen/{nombreArchivo}")
+                        )
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/mensajeSeguro").hasRole("CLIENTE")
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/producto/{idProducto}").permitAll()
+                        .requestMatchers("/api/producto/listar/**").permitAll()
+                        .requestMatchers("/api/atributo/{idAtributo}").permitAll()
+                        .requestMatchers("/api/atributo/listar").permitAll()
+                        .requestMatchers("/api/categoria/{idCategoria}").permitAll()
+                        .requestMatchers("/api/categoria/listar").permitAll()
+                        .requestMatchers("/api/marca/{idMarca}").permitAll()
+                        .requestMatchers("/api/marca/listar").permitAll()
+                        .requestMatchers("/api/subcategoria/{idSubCategoria}").permitAll()
+                        .requestMatchers("/api/subcategoria/listar").permitAll()
+                        .requestMatchers("/api/valor-atributo/{idValorAtributo}").permitAll()
+                        .requestMatchers("/api/valor-atributo/listar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/imagen/{nombreArchivo}").permitAll()
+                        .requestMatchers("/api/pasarela-pago/comprar").hasRole("CLIENTE")
+                        .requestMatchers("/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
@@ -75,13 +106,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 
 }

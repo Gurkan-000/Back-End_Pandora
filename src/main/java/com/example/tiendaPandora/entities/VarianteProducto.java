@@ -40,6 +40,9 @@ public class VarianteProducto {
     )
     private BigDecimal precio;
 
+    @Column(nullable = false)
+    private String url;
+
     @OneToMany(
             mappedBy = "varianteProducto",
             fetch = FetchType.LAZY,

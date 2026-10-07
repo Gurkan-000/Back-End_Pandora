@@ -14,6 +14,7 @@ public class MapperVarianteProducto {
         return VarianteProducto.builder()
                 .stock(requestVarianteProducto.getStock())
                 .precio(requestVarianteProducto.getPrecio())
+                .url(requestVarianteProducto.getUrl())
                 .build();
     }
 
