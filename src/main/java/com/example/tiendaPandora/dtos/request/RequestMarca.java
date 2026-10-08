@@ -13,7 +13,6 @@ import lombok.Setter;
 public class RequestMarca {
 
     @NotBlank(message = "Nombre de marca no valido")
-    @Pattern(regexp = "^[A-Za-z0-9]+$", message = "El nombre solo puede contener letras y numeros")
     private String nombreMarca;
 
 }

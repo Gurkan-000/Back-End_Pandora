@@ -43,25 +43,7 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/**",
-                                "/api/producto/{idProducto}",
-                                "/api/producto/listar/**",
-                                "/api/atributo/{idAtributo}",
-                                "/api/atributo/listar/",
-                                "/api/categoria/{idCategoria}",
-                                "/api/categoria/listar",
-                                "/api/marca/{idMarca}",
-                                "/api/marca/listar",
-                                "/api/subcategoria/{idSubCategoria}",
-                                "/api/subcategoria/listar",
-                                "/api/valor-atributo/{idValorAtributo}",
-                                "/api/valor-atributo/listar")
-                        .ignoringRequestMatchers(request ->
-                                HttpMethod.GET.matches(request.getMethod())
-                                        && request.getRequestURI().startsWith("/api/imagen/{nombreArchivo}")
-                        )
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
@@ -106,11 +88,30 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:4200")
+        );
         configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        configuration.setAllowedMethods(
+                Arrays.asList(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"
+                )
+        );
+        configuration.setAllowedHeaders(
+                Arrays.asList(
+                        "Content-Type",
+                        "Authorization",
+                        "X-XSRF-TOKEN"
+                )
+        );
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

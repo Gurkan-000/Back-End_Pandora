@@ -20,6 +20,10 @@ public class ImagenService {
 
     private final Path ruta = Paths.get("imagenes/productos");
 
+    public ImagenService() throws IOException {
+        Files.createDirectories(ruta);
+    }
+
     public ResponseImagen subirImagen(MultipartFile imagen) throws IOException {
 
         if(imagen == null || imagen.isEmpty()) {

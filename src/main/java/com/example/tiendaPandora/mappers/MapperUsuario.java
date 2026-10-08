@@ -1,6 +1,7 @@
 package com.example.tiendaPandora.mappers;
 
 import com.example.tiendaPandora.dtos.request.RequestRegister;
+import com.example.tiendaPandora.dtos.response.ResponseAuth;
 import com.example.tiendaPandora.entities.Usuario;
 import com.example.tiendaPandora.entities.enums.Rol;
 
@@ -14,6 +15,12 @@ public class MapperUsuario {
                 .contrasena(contrasenaEncriptada)
                 .rol(Rol.CLIENTE)
                 .correoVerificado(false)
+                .build();
+    }
+
+    public static ResponseAuth toResponse(Usuario usuario) {
+        return ResponseAuth.builder()
+                .rol(usuario.getRol().name())
                 .build();
     }
 

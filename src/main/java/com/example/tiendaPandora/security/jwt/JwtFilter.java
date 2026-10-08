@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = null;
             String accessToken = cookieService.getCookie(request, "accessToken");
 
-            if(accessToken != null) {
+            if(accessToken != null && !accessToken.isBlank()) {
                 username = jwtService.extractUsername(accessToken);
             }
 

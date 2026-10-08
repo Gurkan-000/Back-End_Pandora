@@ -1,9 +1,12 @@
 package com.example.tiendaPandora.services;
 
 import com.example.tiendaPandora.dtos.request.RequestAuth;
+import com.example.tiendaPandora.dtos.request.RequestConfirmacionContrasena;
 import com.example.tiendaPandora.dtos.request.RequestRegister;
 import com.example.tiendaPandora.dtos.response.ResponseAuth;
+import com.example.tiendaPandora.entities.Token;
 import com.example.tiendaPandora.entities.Usuario;
+import com.example.tiendaPandora.entities.enums.Rol;
 import com.example.tiendaPandora.exceptions.EntidadNoEncontradaException;
 import com.example.tiendaPandora.exceptions.ReglaDeNegocioException;
 import com.example.tiendaPandora.exceptions.TokenException;
@@ -11,7 +14,9 @@ import com.example.tiendaPandora.mappers.MapperUsuario;
 import com.example.tiendaPandora.repositories.UsuarioRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,9 +39,13 @@ public class AuthService {
 
     private final CookieService serviceCookie;
 
+    public Usuario buscarUsuario(String correo){
+        return usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new EntidadNoEncontradaException("No existe usuario con ese correo"));
+    }
+
     public ResponseAuth iniciarSesion(RequestAuth requestAuth, HttpServletResponse response) {
-        Usuario usuario = usuarioRepository.findByCorreo(requestAuth.getCorreo())
-                .orElseThrow(() -> new EntidadNoEncontradaException("Usuario no encontrado"));
+        Usuario usuario = buscarUsuario(requestAuth.getCorreo());
 
         if(!usuario.getCorreoVerificado()){
             throw new BadCredentialsException("El correo no fue verificado");
@@ -73,30 +82,29 @@ public class AuthService {
         serviceCookie.deleteCookie("refreshToken", response);
     }
 
+    @Transactional
     public void registrar(RequestRegister requestRegister) {
 
         Optional<Usuario> usuarioBuscado = usuarioRepository.findByCorreo(requestRegister.getCorreo());
 
-        if (usuarioBuscado.isPresent()) {
+        if(usuarioBuscado.isPresent()){
             if(usuarioBuscado.get().getCorreoVerificado()){
                 throw new ReglaDeNegocioException("El correo ya está registrado");
-            }else{
-                throw new ReglaDeNegocioException("Tu cuenta ya fue registrada pero no esta verificada. Revisa la bandeja de tu correo para verificarlo");
             }
+        }else {
+            Usuario usuario = MapperUsuario.toEntity(requestRegister, passwordEncoder.encode(requestRegister.getContrasena()));
+            usuarioRepository.save(usuario);
         }
 
-        Usuario usuario = MapperUsuario.toEntity(requestRegister, passwordEncoder.encode(requestRegister.getContrasena()));
-        usuarioRepository.save(usuario);
-
         emailService.enviarCorreoVerificacion(
-                usuario.getCorreo()
+                requestRegister.getCorreo()
         );
+
     }
 
     public void verificarCorreo(String correo) {
 
-        Usuario usuario = usuarioRepository.findByCorreo(correo)
-                        .orElseThrow(() -> new EntidadNoEncontradaException("Usuario no encontrado"));
+        Usuario usuario = buscarUsuario(correo);
 
         if(usuario.getCorreoVerificado()){
             throw new ReglaDeNegocioException("El correo ya esta verificado");
@@ -115,10 +123,65 @@ public class AuthService {
             throw new TokenException("Refresh token no encontrado");
         }
 
-        Usuario usuario = tokenService.validar(refreshToken);
+        Token token = tokenService.buscarToken(refreshToken);
+        tokenService.validar(token);
+        Usuario usuario = token.getUsuario();
 
         String accessToken = tokenService.generateAccessToken(usuario);
 
         serviceCookie.addHttpOnlyCookie("accessToken", accessToken, 30 * 60, response);
+    }
+
+    public String enviarCorreoDeRecuperacion(String correo) {
+
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByCorreo(correo);
+
+        if (usuarioOptional.isPresent()) {
+
+            Usuario usuario = usuarioOptional.get();
+
+            if (usuario.getRol() != Rol.ADMIN) {
+                String token =
+                        tokenService.generateTokenDeRecuperacionContrasena(usuario);
+
+                emailService.enviarCorreoDeRecuperacionContrasena(
+                        usuario.getCorreo(),
+                        token
+                );
+            }
+        }
+
+        return "Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.";
+    }
+
+    @Transactional
+    public String confirmarContrasena(
+            @Valid RequestConfirmacionContrasena request) {
+
+        Token token = tokenService.validarTokenRecuperacion(request.getToken());
+
+        Usuario usuario = token.getUsuario();
+
+        String contrasenaNueva = request.getContrasenaNueva();
+        String contrasenaConfirmada = request.getContrasenaConfirmada();
+
+        if (!contrasenaNueva.equals(contrasenaConfirmada)) {
+            throw new ReglaDeNegocioException(
+                    "Las contraseñas no coinciden"
+            );
+        }
+
+        usuario.setContrasena(passwordEncoder.encode(contrasenaNueva));
+        token.setRevocado(true);
+
+        return "Contraseña actualizada correctamente";
+    }
+
+    public ResponseAuth obtenerUsuarioActual(Authentication authentication) {
+        String correo = authentication.getName();
+
+        Usuario usuario = buscarUsuario(correo);
+
+        return MapperUsuario.toResponse(usuario);
     }
 }

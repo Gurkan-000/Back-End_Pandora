@@ -13,7 +13,7 @@ import lombok.Setter;
 public class RequestSubCategoria {
 
     @NotBlank(message = "Nombre de sub-categoria no valido")
-    @Pattern(regexp = "^[A-Za-z]+$", message = "El nombre solo puede contener letras")
+    @Pattern(regexp = "^[A-Za-z]+(?: [A-Za-z]+)*$", message = "El nombre solo puede contener letras sin espacios en los extremos")
     private String nombreSubCategoria;
 
 }
