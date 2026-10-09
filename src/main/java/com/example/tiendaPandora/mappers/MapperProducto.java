@@ -10,6 +10,8 @@ public class MapperProducto {
         return Producto.builder()
                 .nombreProducto(request.getNombreProducto())
                 .descripcion(request.getDescripcion())
+                .precio(request.getPrecio())
+                .urlImagen(request.getUrlImagen())
                 .build();
     }
 
@@ -20,6 +22,8 @@ public class MapperProducto {
                 .idMarca(producto.getMarca().getIdMarca())
                 .nombreProducto(producto.getNombreProducto())
                 .descripcion(producto.getDescripcion())
+                .precio(producto.getPrecio())
+                .urlImagen(producto.getUrlImagen())
                 .nombreMarca(producto.getMarca().getNombreMarca())
                 .nombreSubcategoria(producto.getSubCategoria().getNombreSubcategoria())
                 .cantidadVariantes(producto.getVariantes().size())

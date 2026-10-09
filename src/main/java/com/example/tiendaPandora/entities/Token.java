@@ -21,7 +21,7 @@ public class Token {
     @UuidGenerator
     private UUID idToken;
 
-    @Column(nullable = false, unique = true)
+    @Column(length = 512, nullable = false, unique = true)
     private String token;
 
     @Column(nullable = false, unique = true)

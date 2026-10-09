@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/valor-atributo/{idValorAtributo}").permitAll()
                         .requestMatchers("/api/valor-atributo/listar").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/imagen/{nombreArchivo}").permitAll()
-                        .requestMatchers("/api/pasarela-pago/comprar").hasRole("CLIENTE")
+                        .requestMatchers("/api/pasarela-pago/comprar").hasAnyRole("CLIENTE","ADMIN")
                         .requestMatchers("/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

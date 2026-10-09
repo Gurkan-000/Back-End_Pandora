@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,17 @@ public class Producto {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String descripcion;
+
+    @Column(
+            name = "precio",
+            nullable = false,
+            precision = 10,
+            scale = 2
+    )
+    private BigDecimal precio;
+
+    @Column(nullable = false)
+    private String urlImagen;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

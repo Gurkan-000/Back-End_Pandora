@@ -129,6 +129,7 @@ public class ProductoService {
 
         producto.setNombreProducto(request.getNombreProducto());
         producto.setDescripcion(request.getDescripcion());
+        producto.setPrecio(request.getPrecio());
 
         for (UUID idAtributo : atributosAgregados) {
 

@@ -16,7 +16,9 @@ public class ResponseVarianteProducto {
 
     private Integer stock;
 
-    private BigDecimal precio;
+    private String urlImagen;
+
+    private Boolean esPrincipal;
 
     private List<ResponseValorAtributo> atributos;
 
