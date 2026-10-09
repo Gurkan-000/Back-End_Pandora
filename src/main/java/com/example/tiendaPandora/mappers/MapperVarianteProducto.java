@@ -13,8 +13,8 @@ public class MapperVarianteProducto {
     public static VarianteProducto toEntity(RequestVarianteProducto requestVarianteProducto) {
         return VarianteProducto.builder()
                 .stock(requestVarianteProducto.getStock())
-                .precio(requestVarianteProducto.getPrecio())
-                .url(requestVarianteProducto.getUrl())
+                .urlImagen(requestVarianteProducto.getUrlImagen())
+                .esPrincipal(requestVarianteProducto.getEsPrincipal())
                 .build();
     }
 
@@ -27,7 +27,8 @@ public class MapperVarianteProducto {
         return ResponseVarianteProducto.builder()
                 .idVarianteProducto(varianteProducto.getIdVarianteProducto())
                 .stock(varianteProducto.getStock())
-                .precio(varianteProducto.getPrecio())
+                .esPrincipal(varianteProducto.getEsPrincipal())
+                .urlImagen(varianteProducto.getUrlImagen())
                 .atributos(atributos)
                 .build();
     }

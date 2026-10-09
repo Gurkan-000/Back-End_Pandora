@@ -49,6 +49,7 @@ public class VarianteProductoService {
 
         validarVariantesDelProducto(producto, requestVarianteProducto);
 
+        cambiarPrincipal(requestVarianteProducto, producto, null);
         VarianteProducto varianteProducto = MapperVarianteProducto.toEntity(requestVarianteProducto);
 
         producto.addVariante(varianteProducto);
@@ -80,9 +81,10 @@ public class VarianteProductoService {
         validarVariantesDelProducto(producto, requestVarianteProducto);
 
         VarianteProducto varianteProducto = buscarVarianteProducto(idVarianteProducto);
+        cambiarPrincipal(requestVarianteProducto, producto, varianteProducto);
 
-        varianteProducto.setPrecio(requestVarianteProducto.getPrecio());
         varianteProducto.setStock(requestVarianteProducto.getStock());
+        varianteProducto.setEsPrincipal(requestVarianteProducto.getEsPrincipal());
 
         if(!validarCombinacionExistente(idProducto, requestVarianteProducto)){
             varianteProducto.getVariantesAtributos().clear();
@@ -106,6 +108,10 @@ public class VarianteProductoService {
     public String eliminar(UUID idVarianteProducto){
 
         VarianteProducto varianteProducto = buscarVarianteProducto(idVarianteProducto);
+
+        if(varianteProducto.getEsPrincipal()){
+            throw new ReglaDeNegocioException("No se puede eliminar la variante principal");
+        }
 
         varianteProductoRepository.delete(varianteProducto);
 
@@ -147,6 +153,46 @@ public class VarianteProductoService {
         return varianteAtributoRepository.existeCombinacion(idProducto,
                 idsValores,
                 idsValores.size());
+    }
+
+    private void cambiarPrincipal(RequestVarianteProducto request, Producto producto, VarianteProducto varianteProducto){
+
+        List<VarianteProducto> variantes = producto.getVariantes();
+
+        if(variantes.isEmpty()){
+            request.setEsPrincipal(true);
+            return;
+        }
+
+        if(varianteProducto != null){
+            if (variantes.size() == 1 && !request.getEsPrincipal()) {
+                throw new ReglaDeNegocioException(
+                        "No se puede quitar el principal porque es la única variante del producto"
+                );
+            }
+            if (request.getEsPrincipal()) {
+                desmarcarPrincipal(producto, varianteProducto);
+            }
+            return;
+        }
+
+        if (request.getEsPrincipal()) {
+            desmarcarPrincipal(producto, null);
+        }
+    }
+
+    private void desmarcarPrincipal(Producto producto, VarianteProducto varianteExcluir) {
+
+        Optional<VarianteProducto> variantePrincipal = varianteProductoRepository.findByEsPrincipalAndProducto(true, producto);
+
+        if (variantePrincipal.isPresent()) {
+
+            VarianteProducto principal = variantePrincipal.get();
+
+            if (varianteExcluir == null || !principal.getIdVarianteProducto().equals(varianteExcluir.getIdVarianteProducto())) {
+                principal.setEsPrincipal(false);
+            }
+        }
     }
 
 }

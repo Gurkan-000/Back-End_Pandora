@@ -2,6 +2,7 @@ package com.example.tiendaPandora.dtos.response;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter @Setter
@@ -19,6 +20,10 @@ public class ResponseProducto {
     private String nombreProducto;
 
     private String descripcion;
+
+    private BigDecimal precio;
+
+    private String urlImagen;
 
     private String nombreMarca;
 

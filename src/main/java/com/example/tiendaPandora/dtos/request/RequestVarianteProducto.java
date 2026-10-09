@@ -1,9 +1,6 @@
 package com.example.tiendaPandora.dtos.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,10 +21,10 @@ public class RequestVarianteProducto {
     @PositiveOrZero(message = "Stock no valido")
     private Integer stock;
 
-    @Positive(message = "Precio no valido")
-    private BigDecimal precio;
+    @NotNull(message = "Debe indicar si es principal")
+    private Boolean esPrincipal;
 
     @NotBlank(message = "URL no valido")
-    private String url;
+    private String urlImagen;
 
 }

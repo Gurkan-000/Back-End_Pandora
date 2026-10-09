@@ -32,25 +32,11 @@ public class VarianteProducto {
     @Column(nullable = false)
     private Integer stock;
 
-    @Column(
-            name = "precio",
-            nullable = false,
-            precision = 10,
-            scale = 2
-    )
-    private BigDecimal precio;
+    @Column(nullable = false)
+    private String urlImagen;
 
     @Column(nullable = false)
-    private String url;
-
-    @OneToMany(
-            mappedBy = "varianteProducto",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @Builder.Default
-    private List<ImagenProducto> imagenes = new ArrayList<>();
+    private Boolean esPrincipal;
 
     @OneToMany(
             mappedBy = "variante",
