@@ -58,7 +58,7 @@ public class AuthService {
         String accessToken = tokenService.generateAccessToken(usuario);
         String refreshToken = tokenService.generateRefreshToken(usuario);
 
-        serviceCookie.addHttpOnlyCookie("accessToken", accessToken, 30, response);
+        serviceCookie.addHttpOnlyCookie("accessToken", accessToken, 30 * 60, response);
         serviceCookie.addHttpOnlyCookie("refreshToken", refreshToken, 7 * 24 * 60 * 60, response);
 
         return MapperUsuario.toResponse(usuario);
