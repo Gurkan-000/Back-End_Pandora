@@ -42,28 +42,31 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/producto/{idProducto}").permitAll()
-                        .requestMatchers("/api/producto/listar/**").permitAll()
-                        .requestMatchers("/api/atributo/{idAtributo}").permitAll()
-                        .requestMatchers("/api/atributo/listar").permitAll()
-                        .requestMatchers("/api/categoria/{idCategoria}").permitAll()
-                        .requestMatchers("/api/categoria/listar").permitAll()
-                        .requestMatchers("/api/marca/{idMarca}").permitAll()
-                        .requestMatchers("/api/marca/listar").permitAll()
-                        .requestMatchers("/api/subcategoria/{idSubCategoria}").permitAll()
-                        .requestMatchers("/api/subcategoria/listar").permitAll()
-                        .requestMatchers("/api/valor-atributo/{idValorAtributo}").permitAll()
-                        .requestMatchers("/api/valor-atributo/listar").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/imagen/{nombreArchivo}").permitAll()
-                        .requestMatchers("/api/pasarela-pago/comprar").hasAnyRole("CLIENTE","ADMIN")
-                        .requestMatchers("/api/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/categoria/**",
+                                "/api/subcategoria/**",
+                                "/api/atributo/**",
+                                "/api/valor-atributo/**",
+                                "/api/marca/**",
+                                "/api/producto/**",
+                                "/api/imagen/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/categoria/**",
+                                "/api/subcategoria/**",
+                                "/api/atributo/**",
+                                "/api/valor-atributo/**",
+                                "/api/marca/**",
+                                "/api/producto/**",
+                                "/api/variante-producto",
+                                "/api/imagen/**"
+                        ).hasRole("ADMIN")
+                        .requestMatchers("/api/pasarela-pago/comprar").hasRole("CLIENTE")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint()))
