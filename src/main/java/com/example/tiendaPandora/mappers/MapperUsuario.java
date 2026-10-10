@@ -21,6 +21,9 @@ public class MapperUsuario {
     public static ResponseAuth toResponse(Usuario usuario) {
         return ResponseAuth.builder()
                 .rol(usuario.getRol().name())
+                .nombre(usuario.getNombre())
+                .apellido(usuario.getApellido())
+                .correo(usuario.getCorreo())
                 .build();
     }
 

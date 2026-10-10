@@ -61,7 +61,7 @@ public class AuthService {
         serviceCookie.addHttpOnlyCookie("accessToken", accessToken, 30, response);
         serviceCookie.addHttpOnlyCookie("refreshToken", refreshToken, 7 * 24 * 60 * 60, response);
 
-        return new ResponseAuth(usuario.getRol().toString());
+        return MapperUsuario.toResponse(usuario);
     }
 
     @Transactional

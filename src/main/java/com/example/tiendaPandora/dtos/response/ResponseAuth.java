@@ -10,4 +10,10 @@ public class ResponseAuth {
 
     private String rol;
 
+    private String nombre;
+
+    private String apellido;
+
+    private String correo;
+
 }
