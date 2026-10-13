@@ -8,7 +8,7 @@ public class MapperCategoria {
 
     public static Categoria toEntity(RequestCategoria requestCategoria) {
         return Categoria.builder()
-                .nombreCategoria(requestCategoria.getNombreCategoria())
+                .nombreCategoria(requestCategoria.getNombreCategoria().trim())
                 .build();
     }
 

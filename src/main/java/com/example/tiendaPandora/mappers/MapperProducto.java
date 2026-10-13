@@ -8,8 +8,8 @@ public class MapperProducto {
 
     public static Producto toEntity(RequestProducto request){
         return Producto.builder()
-                .nombreProducto(request.getNombreProducto())
-                .descripcion(request.getDescripcion())
+                .nombreProducto(request.getNombreProducto().trim())
+                .descripcion(request.getDescripcion().trim())
                 .precio(request.getPrecio())
                 .urlImagen(request.getUrlImagen())
                 .build();

@@ -8,7 +8,7 @@ public class MapperAtributo {
 
     public static Atributo toEntity(RequestAtributo request) {
         return Atributo.builder()
-                .nombreAtributo(request.getNombreAtributo())
+                .nombreAtributo(request.getNombreAtributo().trim())
                 .build();
 
     }

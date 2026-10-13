@@ -14,7 +14,7 @@ public interface ProductoAtributoRepository extends JpaRepository<ProductoAtribu
     @Modifying
     @Query("""
         DELETE FROM ProductoAtributo pa
-        WHERE pa.atributo.id = :idAtributo
+        WHERE pa.atributo.idAtributo = :idAtributo
     """)
     void eliminarPorAtributo(@Param("idAtributo") UUID idAtributo);
 

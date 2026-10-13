@@ -1,6 +1,5 @@
 package com.example.tiendaPandora.services;
 
-import com.example.tiendaPandora.dtos.request.RequestAtributosDelProducto;
 import com.example.tiendaPandora.dtos.request.RequestProducto;
 import com.example.tiendaPandora.dtos.response.ResponseAtributo;
 import com.example.tiendaPandora.dtos.response.ResponseProducto;
@@ -10,7 +9,6 @@ import com.example.tiendaPandora.exceptions.EntidadNoEncontradaException;
 import com.example.tiendaPandora.exceptions.ReglaDeNegocioException;
 import com.example.tiendaPandora.mappers.MapperProducto;
 import com.example.tiendaPandora.mappers.MapperVarianteProducto;
-import com.example.tiendaPandora.repositories.ProductoAtributoRepository;
 import com.example.tiendaPandora.repositories.ProductoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

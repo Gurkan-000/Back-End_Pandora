@@ -9,7 +9,7 @@ public class MapperSubCategoria {
 
     public static SubCategoria toEntity(RequestSubCategoria requestSubCategoria) {
         return SubCategoria.builder()
-                .nombreSubcategoria(requestSubCategoria.getNombreSubCategoria())
+                .nombreSubcategoria(requestSubCategoria.getNombreSubCategoria().trim())
                 .build();
     }
 

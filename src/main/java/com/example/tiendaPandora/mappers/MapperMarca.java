@@ -8,7 +8,7 @@ public class MapperMarca {
 
     public static Marca toEntity(RequestMarca requestMarca) {
         return Marca.builder()
-                .nombreMarca(requestMarca.getNombreMarca())
+                .nombreMarca(requestMarca.getNombreMarca().trim())
                 .build();
 
     }
