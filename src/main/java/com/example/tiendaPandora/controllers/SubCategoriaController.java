@@ -25,6 +25,12 @@ public class SubCategoriaController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/listar/categoria/{idCategoria}")
+    public ResponseEntity<List<ResponseSubCategoria>> listarSubCategoriasPorCategoria(@PathVariable UUID idCategoria) {
+        List<ResponseSubCategoria> response = subCategoriaService.listarSubCategoriasPorCategoria(idCategoria);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @GetMapping("/{idSubCategoria}")
     public ResponseEntity<ResponseSubCategoria> buscarPorIdSubCategoria(
             @PathVariable UUID idSubCategoria) {

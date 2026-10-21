@@ -144,6 +144,13 @@ public class ProductoService {
         return "Producto actualizado correctamente";
     }
 
+    public String actualizarImagenProducto(String urlImagen, UUID idProducto){
+        Producto producto = buscarProducto(idProducto);
+        producto.setUrlImagen(urlImagen);
+        productoRepository.save(producto);
+        return "Imagen de producto actualizada correctamente";
+    }
+
     public String eliminar(UUID idProducto) {
 
         Producto producto = buscarProducto(idProducto);

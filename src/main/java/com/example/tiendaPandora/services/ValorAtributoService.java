@@ -29,6 +29,12 @@ public class ValorAtributoService {
                 .toList();
     }
 
+    public List<ResponseValorAtributo> listarValoresPorAtributo(UUID idAtributo) {
+        return valorAtributoRepository.findByAtributoIdAtributo(idAtributo).stream()
+                .map(MapperValorAtributo::toResponse)
+                .toList();
+    }
+
     public ValorAtributo buscarValorAtributo(UUID idValorAtributo) {
 
         return valorAtributoRepository.findById(idValorAtributo)

@@ -6,7 +6,7 @@ public class MapperImagen {
 
     public static ResponseImagen toResponse(String nombreFinal){
         return ResponseImagen.builder()
-                .url("/api/imagen/"+nombreFinal)
+                .urlImagen("/api/imagen/"+nombreFinal)
                 .build();
     }
 
