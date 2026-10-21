@@ -86,5 +86,14 @@ public class ProductoController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PatchMapping("/actualizar/{idProducto}/urlImagen")
+    public ResponseEntity<String> actualizar(@PathVariable UUID idProducto, @RequestParam String urlImagen) {
+
+        String response = productoService.actualizarImagenProducto(urlImagen, idProducto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }
 

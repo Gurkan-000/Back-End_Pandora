@@ -25,6 +25,12 @@ public class ValorAtributoController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/listar/atributo/{idAtributo}")
+    public ResponseEntity<List<ResponseValorAtributo>> listarValoresPorAtributo(@PathVariable UUID idAtributo) {
+        List<ResponseValorAtributo> response = valorAtributoService.listarValoresPorAtributo(idAtributo);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @GetMapping("/{idValorAtributo}")
     public ResponseEntity<ResponseValorAtributo> buscarPorIdValorAtributo(
             @PathVariable UUID idValorAtributo) {

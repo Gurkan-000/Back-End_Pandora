@@ -28,6 +28,12 @@ public class SubCategoriaService {
                 .toList();
     }
 
+    public List<ResponseSubCategoria> listarSubCategoriasPorCategoria(UUID idCategoria) {
+        return subCategoriaRepository.findByCategoriaIdCategoria(idCategoria).stream()
+                .map(MapperSubCategoria::toResponse)
+                .toList();
+    }
+
     public SubCategoria buscarSubCategoria(UUID idSubCategoria) {
         return subCategoriaRepository.findById(idSubCategoria)
                 .orElseThrow(() ->

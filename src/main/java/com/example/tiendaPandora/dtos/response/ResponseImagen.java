@@ -8,6 +8,6 @@ import lombok.*;
 @Builder
 public class ResponseImagen {
 
-    private String url;
+    private String urlImagen;
 
 }
