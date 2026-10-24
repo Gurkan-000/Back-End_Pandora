@@ -24,7 +24,5 @@ public class RequestVarianteProducto {
     @NotNull(message = "Debe indicar si es principal")
     private Boolean esPrincipal;
 
-    @NotBlank(message = "URL no valido")
     private String urlImagen;
-
 }

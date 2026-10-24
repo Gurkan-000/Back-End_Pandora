@@ -39,7 +39,7 @@ public class ImagenService {
 
         validarExtension(imagen);
 
-        String nombreFinal = UUID.randomUUID() + ".webp";
+        String nombreFinal = UUID.randomUUID() + extraerExtension(imagen.getOriginalFilename());
 
         Path destino = ruta.resolve(nombreFinal);
 
@@ -63,19 +63,22 @@ public class ImagenService {
             );
         }
 
-        String extension = nombreOriginal
-                .substring(nombreOriginal.lastIndexOf("."))
-                .toLowerCase();
+        String extension = extraerExtension(nombreOriginal);
 
         if (!extension.equals(".jpg")
                 && !extension.equals(".jpeg")
-                && !extension.equals(".png")) {
+                && !extension.equals(".png")
+                && !extension.equals(".webp")) {
 
             throw new IllegalArgumentException(
                     "Tipo de imagen no permitido"
             );
         }
 
+    }
+
+    public String extraerExtension(String nombreImagen){
+        return nombreImagen.substring(nombreImagen.lastIndexOf(".")).toLowerCase();
     }
 
     public Path obtenerPath(String nombreArchivo) throws NoSuchFileException {

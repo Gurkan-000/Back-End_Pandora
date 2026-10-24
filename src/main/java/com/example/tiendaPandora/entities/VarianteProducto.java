@@ -32,7 +32,6 @@ public class VarianteProducto {
     @Column(nullable = false)
     private Integer stock;
 
-    @Column(nullable = false)
     private String urlImagen;
 
     @Column(nullable = false)

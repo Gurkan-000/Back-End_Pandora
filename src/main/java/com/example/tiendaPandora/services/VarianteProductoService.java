@@ -105,6 +105,13 @@ public class VarianteProductoService {
         return "Variante de producto actualizado correctamente";
     }
 
+    public String actualizarImagenVarianteProducto(String urlImagen, UUID idVarianteProducto){
+        VarianteProducto varianteProducto = buscarVarianteProducto(idVarianteProducto);
+        varianteProducto.setUrlImagen(urlImagen);
+        varianteProductoRepository.save(varianteProducto);
+        return "Imagen de la variante de un producto actualizada correctamente";
+    }
+
     public String eliminar(UUID idVarianteProducto){
 
         VarianteProducto varianteProducto = buscarVarianteProducto(idVarianteProducto);

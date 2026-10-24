@@ -2,7 +2,6 @@ package com.example.tiendaPandora.controllers;
 
 import com.example.tiendaPandora.dtos.request.RequestVarianteProducto;
 import com.example.tiendaPandora.dtos.response.ResponseVarianteProducto;
-import com.example.tiendaPandora.entities.VarianteProducto;
 import com.example.tiendaPandora.services.VarianteProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +42,14 @@ public class VarianteProductoController {
         String response = varianteProductoService.eliminar(idVariante);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/actualizar/{idVariante}/urlImagen")
+    public ResponseEntity<String> actualizarImagenVarianteProducto(@PathVariable UUID idVariante, @RequestParam String urlImagen) {
+
+        String response = varianteProductoService.actualizarImagenVarianteProducto(urlImagen, idVariante);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
