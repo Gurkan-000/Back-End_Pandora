@@ -29,6 +29,7 @@ public class ProductoService {
     private final MarcaService marcaService;
     private final SubCategoriaService subCategoriaService;
     private final AtributoService atributoService;
+    private final ImagenService imagenService;
 
     public List<ResponseProducto> listar() {
         return productoRepository.findAll()
@@ -65,6 +66,8 @@ public class ProductoService {
     @Transactional
     public ResponseProducto crear(RequestProducto request, UUID idMarca, UUID idSubCategoria) {
 
+        imagenService.validarUrlImagen(request.getUrlImagen());
+
         Marca marca = marcaService.buscarMarca(idMarca);
         SubCategoria subCategoria = subCategoriaService.buscarSubCategoria(idSubCategoria);
 
@@ -90,6 +93,8 @@ public class ProductoService {
 
     @Transactional
     public String actualizar(UUID idProducto, UUID idMarca, UUID idSubCategoria, RequestProducto request) {
+
+        imagenService.validarUrlImagen(request.getUrlImagen());
 
         Producto producto = buscarProducto(idProducto);
 
@@ -128,6 +133,7 @@ public class ProductoService {
         producto.setNombreProducto(request.getNombreProducto());
         producto.setDescripcion(request.getDescripcion());
         producto.setPrecio(request.getPrecio());
+        producto.setUrlImagen(request.getUrlImagen());
 
         for (UUID idAtributo : atributosAgregados) {
 
@@ -145,6 +151,7 @@ public class ProductoService {
     }
 
     public String actualizarImagenProducto(String urlImagen, UUID idProducto){
+        imagenService.validarUrlImagen(urlImagen);
         Producto producto = buscarProducto(idProducto);
         producto.setUrlImagen(urlImagen);
         productoRepository.save(producto);

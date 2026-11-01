@@ -14,14 +14,38 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 public class ImagenService {
 
-    private final Path ruta = Paths.get("imagenes/productos");
+    private static final String PREFIJO_URL = "/api/imagen/";
+    private static final Pattern FORMATO_URL_IMAGEN = Pattern.compile(
+            "^/api/imagen/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\.(jpg|jpeg|png|webp)$"
+    );
+
+    private final Path ruta;
 
     public ImagenService() throws IOException {
+        this(Paths.get("imagenes/productos"));
+    }
+
+    ImagenService(Path ruta) throws IOException {
+        this.ruta = ruta;
         Files.createDirectories(ruta);
+    }
+
+    public void validarUrlImagen(String urlImagen) {
+        if (urlImagen == null || !FORMATO_URL_IMAGEN.matcher(urlImagen).matches()) {
+            throw new IllegalArgumentException("La URL de imagen no tiene un formato válido");
+        }
+
+        String nombreArchivo = urlImagen.substring(PREFIJO_URL.length());
+        try {
+            obtenerPath(nombreArchivo);
+        } catch (NoSuchFileException e) {
+            throw new IllegalArgumentException("La imagen indicada no existe", e);
+        }
     }
 
     public ResponseImagen subirImagen(MultipartFile imagen) throws IOException {

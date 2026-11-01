@@ -23,6 +23,7 @@ public class VarianteProductoService {
 
     private final ProductoService productoService;
     private final ValorAtributoService valorAtributoService;
+    private final ImagenService imagenService;
 
     public List<ResponseVarianteProducto> listar(){
         return varianteProductoRepository.findAll().stream()
@@ -44,6 +45,8 @@ public class VarianteProductoService {
 
     @Transactional
     public ResponseVarianteProducto crear(RequestVarianteProducto requestVarianteProducto, UUID idProducto){
+
+        validarUrlImagenOpcional(requestVarianteProducto.getUrlImagen());
 
         Producto producto = productoService.buscarProducto(idProducto);
 
@@ -76,6 +79,8 @@ public class VarianteProductoService {
     @Transactional
     public String actualizar(RequestVarianteProducto requestVarianteProducto, UUID idProducto, UUID idVarianteProducto){
 
+        validarUrlImagenOpcional(requestVarianteProducto.getUrlImagen());
+
         Producto producto = productoService.buscarProducto(idProducto);
 
         validarVariantesDelProducto(producto, requestVarianteProducto);
@@ -106,6 +111,7 @@ public class VarianteProductoService {
     }
 
     public String actualizarImagenVarianteProducto(String urlImagen, UUID idVarianteProducto){
+        imagenService.validarUrlImagen(urlImagen);
         VarianteProducto varianteProducto = buscarVarianteProducto(idVarianteProducto);
         varianteProducto.setUrlImagen(urlImagen);
         varianteProductoRepository.save(varianteProducto);
@@ -160,6 +166,12 @@ public class VarianteProductoService {
         return varianteAtributoRepository.existeCombinacion(idProducto,
                 idsValores,
                 idsValores.size());
+    }
+
+    private void validarUrlImagenOpcional(String urlImagen) {
+        if (urlImagen != null && !urlImagen.isBlank()) {
+            imagenService.validarUrlImagen(urlImagen);
+        }
     }
 
     private void cambiarPrincipal(RequestVarianteProducto request, Producto producto, VarianteProducto varianteProducto){
