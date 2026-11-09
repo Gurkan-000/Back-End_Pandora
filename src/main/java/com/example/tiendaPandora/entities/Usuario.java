@@ -44,6 +44,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Boolean correoVerificado;
 
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE}, mappedBy = "usuario", orphanRemoval = true)
+    private Carrito carrito;
+
     @Override
     public @NullMarked Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));

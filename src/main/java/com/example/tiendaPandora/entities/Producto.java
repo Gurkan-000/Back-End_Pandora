@@ -31,7 +31,6 @@ public class Producto {
     private String descripcion;
 
     @Column(
-            name = "precio",
             nullable = false,
             precision = 10,
             scale = 2

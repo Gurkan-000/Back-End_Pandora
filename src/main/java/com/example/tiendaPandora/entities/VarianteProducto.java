@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +48,14 @@ public class VarianteProducto {
     public void addVarianteAtributo(VarianteAtributo varianteAtributo){
         variantesAtributos.add(varianteAtributo);
         varianteAtributo.setVariante(this);
+    }
+
+    public void reducirStock(Integer stockQuitado){
+        this.stock -= stockQuitado;
+    }
+
+    public void restablecerStock(Integer stockRestablecido){
+        this.stock += stockRestablecido;
     }
 
 }

@@ -7,11 +7,11 @@ import com.example.tiendaPandora.dtos.response.ResponseAuth;
 import com.example.tiendaPandora.entities.Token;
 import com.example.tiendaPandora.entities.Usuario;
 import com.example.tiendaPandora.entities.enums.Rol;
-import com.example.tiendaPandora.exceptions.EntidadNoEncontradaException;
 import com.example.tiendaPandora.exceptions.ReglaDeNegocioException;
 import com.example.tiendaPandora.exceptions.TokenException;
 import com.example.tiendaPandora.mappers.MapperUsuario;
 import com.example.tiendaPandora.repositories.UsuarioRepository;
+import com.example.tiendaPandora.security.jwt.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -29,10 +29,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final CustomUserDetailsService customUserDetailsService;
     private final UsuarioRepository usuarioRepository;
-
     private final EmailService emailService;
     private final TokenService tokenService;
+    private final CarritoService carritoService;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
@@ -40,8 +41,7 @@ public class AuthService {
     private final CookieService serviceCookie;
 
     public Usuario buscarUsuario(String correo){
-        return usuarioRepository.findByCorreo(correo)
-                .orElseThrow(() -> new EntidadNoEncontradaException("No existe usuario con ese correo"));
+        return (Usuario)customUserDetailsService.loadUserByUsername(correo);
     }
 
     public ResponseAuth iniciarSesion(RequestAuth requestAuth, HttpServletResponse response) {
@@ -93,7 +93,8 @@ public class AuthService {
             }
         }else {
             Usuario usuario = MapperUsuario.toEntity(requestRegister, passwordEncoder.encode(requestRegister.getContrasena()));
-            usuarioRepository.save(usuario);
+            usuario = usuarioRepository.save(usuario);
+            carritoService.crear(usuario);
         }
 
         emailService.enviarCorreoVerificacion(
