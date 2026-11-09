@@ -28,7 +28,7 @@ public class SubCategoria {
     )
     private Categoria categoria;
 
-    @Column(length = 40, nullable = false, unique = true)
+    @Column(length = 40, nullable = false)
     private String nombreSubcategoria;
 
     @OneToMany(

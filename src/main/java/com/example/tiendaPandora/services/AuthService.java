@@ -33,6 +33,7 @@ public class AuthService {
 
     private final EmailService emailService;
     private final TokenService tokenService;
+    private final CarritoService carritoService;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
@@ -93,7 +94,8 @@ public class AuthService {
             }
         }else {
             Usuario usuario = MapperUsuario.toEntity(requestRegister, passwordEncoder.encode(requestRegister.getContrasena()));
-            usuarioRepository.save(usuario);
+            usuario = usuarioRepository.save(usuario);
+            carritoService.crear(usuario);
         }
 
         emailService.enviarCorreoVerificacion(
