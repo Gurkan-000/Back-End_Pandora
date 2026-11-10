@@ -23,19 +23,26 @@ public class Carrito {
     private UUID idCarrito;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal precioTotal;
+    @Builder.Default
+    private BigDecimal precioTotal = BigDecimal.ZERO;
 
     @OneToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @Builder.Default
     private List<DetalleCarrito> detalles = new ArrayList<>();
 
     public void addUsuario(Usuario usuario) {
         this.usuario = usuario;
         usuario.setCarrito(this);
+    }
+
+    public void recalcularPrecioTotal() {
+        this.precioTotal = detalles.stream()
+                .map(DetalleCarrito::getPrecioSubTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }

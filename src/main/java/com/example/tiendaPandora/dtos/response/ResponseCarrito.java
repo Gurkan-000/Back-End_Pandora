@@ -16,10 +16,6 @@ public class ResponseCarrito {
 
     private UUID idUsuario;
 
-    private BigDecimal precioUnitario;
-
-    private Integer cantidad;
-
     private BigDecimal precioTotal;
 
 }

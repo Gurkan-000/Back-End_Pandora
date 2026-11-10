@@ -24,7 +24,7 @@ public class DetalleCarrito {
     private Integer cantidad;
 
     @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal precio_unitario;
+    private BigDecimal precioUnitario;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal precioSubTotal;
@@ -36,5 +36,19 @@ public class DetalleCarrito {
     @ManyToOne
     @JoinColumn(name = "id_variante_producto", foreignKey = @ForeignKey(name = "fk_varianteproducto_detallecarrito"))
     private VarianteProducto varianteProducto;
+
+    public void addCarrito(Carrito carrito){
+        this.carrito = carrito;
+        carrito.getDetalles().add(this);
+    }
+
+    public void addVarianteProducto(VarianteProducto varianteProducto){
+        this.varianteProducto = varianteProducto;
+    }
+
+    public void calcularSubTotal(BigDecimal precioUnitario){
+        this.precioUnitario = precioUnitario;
+        precioSubTotal = this.precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
 
 }

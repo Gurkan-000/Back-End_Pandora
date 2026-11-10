@@ -44,7 +44,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Boolean correoVerificado;
 
-    @OneToOne(mappedBy = "usuario", orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE}, mappedBy = "usuario", orphanRemoval = true)
     private Carrito carrito;
 
     @Override

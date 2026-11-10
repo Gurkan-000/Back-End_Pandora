@@ -11,7 +11,7 @@ import com.example.tiendaPandora.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -21,44 +21,32 @@ public class CarritoService {
     private final CarritoRepository carritoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public Carrito buscarCarrito(UUID idCarrito) {
-        return carritoRepository.findById(idCarrito)
-                .orElseThrow(() ->
-                        new EntidadNoEncontradaException("Carrito no encontrado")
-                );
+    public Carrito buscarCarritoPorUsuario(String correo){
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new EntidadNoEncontradaException("Usuario no encontrado"));
+        return usuario.getCarrito();
     }
 
-    public ResponseCarrito buscarPorIdCarrito(UUID idCarrito) {
+    public Carrito buscarCarritoPorId(UUID idCarrito){
+        return carritoRepository.findById(idCarrito)
+                .orElseThrow(() -> new EntidadNoEncontradaException("Carrito no encontrado"));
+    }
 
-        Carrito carrito = buscarCarrito(idCarrito);
-
+    public ResponseCarrito buscarCarrito(String correo){
+        Carrito carrito = buscarCarritoPorUsuario(correo);
         return MapperCarrito.toResponse(carrito);
     }
 
     public void crear(Usuario usuario) {
 
-        Carrito carrito = new Carrito();
+        Carrito carrito = Carrito.builder()
+                .precioTotal(BigDecimal.ZERO)
+                .build();
+
         carrito.addUsuario(usuario);
 
         carritoRepository.save(carrito);
     }
 
-    public String actualizar(UUID idCarrito) {
-
-        Carrito carrito = buscarCarrito(idCarrito);
-
-        carritoRepository.save(carrito);
-
-        return "Carrito actualizado correctamente";
-    }
-
-    public String eliminar(UUID idCarrito) {
-
-        Carrito carrito = buscarCarrito(idCarrito);
-
-        carritoRepository.delete(carrito);
-
-        return "Carrito eliminado correctamente";
-    }
 }
 
