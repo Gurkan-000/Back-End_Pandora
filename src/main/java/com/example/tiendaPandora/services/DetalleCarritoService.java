@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,19 +42,26 @@ public class DetalleCarritoService {
 
         VarianteProducto varianteProducto = varianteProductoService.buscarVarianteProducto(idVarianteProducto);
 
-        int filas = detalleCarritoRepository.reducirStock(idVarianteProducto, requestDetalleCarrito.getCantidad());
+        int filas = varianteProductoService.reducirStock(idVarianteProducto, requestDetalleCarrito.getCantidad());
         if (filas == 0) {
             throw new ReglaDeNegocioException("Stock insuficiente para añadir al carrito");
         }
 
         Carrito carrito = carritoService.buscarCarritoPorId(idCarrito);
 
-        DetalleCarrito detalleCarrito = MapperDetalleCarrito.toEntity(requestDetalleCarrito);
+        Optional<DetalleCarrito> detalleCarrito = detalleCarritoRepository.findByCarritoAndVarianteProducto(carrito, varianteProducto);
 
-        varianteProducto.reducirStock(requestDetalleCarrito.getCantidad());
-        detalleCarrito.calcularSubTotal(varianteProducto.getProducto().getPrecio());
-        detalleCarrito.addVarianteProducto(varianteProducto);
-        detalleCarrito.addCarrito(carrito);
+        if(detalleCarrito.isPresent()) {
+            detalleCarrito.get().setCantidad(detalleCarrito.get().getCantidad() + requestDetalleCarrito.getCantidad());
+            detalleCarrito.get().calcularSubTotal(varianteProducto.getProducto().getPrecio());
+        }else{
+            DetalleCarrito detalleCarritoCreado = MapperDetalleCarrito.toEntity(requestDetalleCarrito);
+
+            detalleCarritoCreado.calcularSubTotal(varianteProducto.getProducto().getPrecio());
+            detalleCarritoCreado.addVarianteProducto(varianteProducto);
+            detalleCarritoCreado.addCarrito(carrito);
+        }
+
         carrito.recalcularPrecioTotal();
     }
 
@@ -71,4 +79,7 @@ public class DetalleCarritoService {
         carrito.recalcularPrecioTotal();
 
     }
+
+
+
 }

@@ -11,7 +11,6 @@ import com.example.tiendaPandora.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -39,9 +38,7 @@ public class CarritoService {
 
     public void crear(Usuario usuario) {
 
-        Carrito carrito = Carrito.builder()
-                .precioTotal(BigDecimal.ZERO)
-                .build();
+        Carrito carrito = Carrito.builder().build();
 
         carrito.addUsuario(usuario);
 

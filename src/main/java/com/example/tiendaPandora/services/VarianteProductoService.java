@@ -214,4 +214,8 @@ public class VarianteProductoService {
         }
     }
 
+    public int reducirStock(UUID idVarianteProducto, Integer cantidad){
+        return varianteProductoRepository.reducirStock(idVarianteProducto, cantidad);
+    }
+
 }

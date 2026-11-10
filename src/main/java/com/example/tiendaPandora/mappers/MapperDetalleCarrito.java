@@ -17,6 +17,7 @@ public class MapperDetalleCarrito {
                 .idDetalleCarrito(detalleCarrito.getIdDetalleCarrito())
                 .idCarrito(detalleCarrito.getCarrito().getIdCarrito())
                 .idVarianteProducto(detalleCarrito.getVarianteProducto().getIdVarianteProducto())
+                .nombreProducto(detalleCarrito.getVarianteProducto().getProducto().getNombreProducto())
                 .precioUnitario(detalleCarrito.getPrecioUnitario())
                 .cantidad(detalleCarrito.getCantidad())
                 .precioSubTotal(detalleCarrito.getPrecioSubTotal())

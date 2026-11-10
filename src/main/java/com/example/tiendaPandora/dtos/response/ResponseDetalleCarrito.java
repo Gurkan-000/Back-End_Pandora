@@ -19,6 +19,8 @@ public class ResponseDetalleCarrito {
 
     private UUID idVarianteProducto;
 
+    private String nombreProducto;
+
     private BigDecimal precioUnitario;
 
     private Integer cantidad;

@@ -18,5 +18,7 @@ public class ResponseCarrito {
 
     private BigDecimal precioTotal;
 
+    private Integer cantidadProductos;
+
 }
 

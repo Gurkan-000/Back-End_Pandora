@@ -50,10 +50,6 @@ public class VarianteProducto {
         varianteAtributo.setVariante(this);
     }
 
-    public void reducirStock(Integer stockQuitado){
-        this.stock -= stockQuitado;
-    }
-
     public void restablecerStock(Integer stockRestablecido){
         this.stock += stockRestablecido;
     }
