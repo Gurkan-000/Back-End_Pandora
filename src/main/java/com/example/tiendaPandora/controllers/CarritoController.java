@@ -28,15 +28,9 @@ public class CarritoController {
         return ResponseEntity.ok(responseCarrito);
     }
 
-    @GetMapping("/listar/{idCarrito}/detalles")
-    public ResponseEntity<List<ResponseDetalleCarrito>> listarDetallesDelCarrito(@PathVariable UUID idCarrito){
-        List<ResponseDetalleCarrito> responseDetallesCarrito = detalleCarritoService.listarPorCarrito(idCarrito);
-        return ResponseEntity.ok(responseDetallesCarrito);
-    }
-
-    @PostMapping("/{idCarrito}/agregar-detalle/{idVarianteProducto}")
-    public ResponseEntity<Void> agregarDetalleCarrito(@PathVariable UUID idCarrito, @PathVariable UUID idVarianteProducto, @Valid @RequestBody RequestDetalleCarrito detalleCarrito){
-        detalleCarritoService.agregarCarrito(idCarrito, idVarianteProducto, detalleCarrito);
+    @PostMapping("/{correo}/agregar-detalle/{idVarianteProducto}")
+    public ResponseEntity<Void> agregarDetalleCarrito(@PathVariable String correo, @PathVariable UUID idVarianteProducto, @Valid @RequestBody RequestDetalleCarrito detalleCarrito){
+        detalleCarritoService.agregarCarrito(correo, idVarianteProducto, detalleCarrito);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -45,6 +39,5 @@ public class CarritoController {
         detalleCarritoService.quitarDetalleCarrito(idDetalleCarrito);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
-
 
 }

@@ -30,15 +30,8 @@ public class DetalleCarritoService {
                 .orElseThrow(() -> new EntidadNoEncontradaException("Detalle de carrito no encontrado"));
     }
 
-    public List<ResponseDetalleCarrito> listarPorCarrito(UUID idCarrito){
-        return detalleCarritoRepository.findByCarrito_IdCarrito(idCarrito)
-                .stream()
-                .map(MapperDetalleCarrito::toResponse)
-                .toList();
-    }
-
     @Transactional
-    public void agregarCarrito(UUID idCarrito, UUID idVarianteProducto, RequestDetalleCarrito requestDetalleCarrito){
+    public void agregarCarrito(String correo, UUID idVarianteProducto, RequestDetalleCarrito requestDetalleCarrito){
 
         VarianteProducto varianteProducto = varianteProductoService.buscarVarianteProducto(idVarianteProducto);
 
@@ -47,7 +40,7 @@ public class DetalleCarritoService {
             throw new ReglaDeNegocioException("Stock insuficiente para añadir al carrito");
         }
 
-        Carrito carrito = carritoService.buscarCarritoPorId(idCarrito);
+        Carrito carrito = carritoService.buscarCarritoPorUsuario(correo);
 
         Optional<DetalleCarrito> detalleCarrito = detalleCarritoRepository.findByCarritoAndVarianteProducto(carrito, varianteProducto);
 

@@ -3,6 +3,7 @@ package com.example.tiendaPandora.dtos.response;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,6 +20,8 @@ public class ResponseCarrito {
     private BigDecimal precioTotal;
 
     private Integer cantidadProductos;
+
+    private List<ResponseDetalleCarrito> detallesCarrito;
 
 }
 
