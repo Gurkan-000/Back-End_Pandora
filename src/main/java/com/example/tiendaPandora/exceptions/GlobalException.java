@@ -4,7 +4,9 @@ import com.example.tiendaPandora.dtos.response.ResponseError;
 import com.example.tiendaPandora.dtos.response.ResponseErrorCampos;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -38,6 +40,19 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseError);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseError> handleAccessDenied(AccessDeniedException e) {
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(403)
+                .mensaje("No tienes permisos para realizar esta operación")
+                .build();
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(responseError);
+    }
+
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<ResponseError> tokenException(TokenException e){
 
@@ -62,6 +77,17 @@ public class GlobalException {
 
     @ExceptionHandler(EntidadNoEncontradaException.class)
     public ResponseEntity<ResponseError> entidadNoEncontradaException(EntidadNoEncontradaException e){
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(404)
+                .mensaje(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseError);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ResponseError> UsernameNotFoundException(UsernameNotFoundException e){
 
         ResponseError responseError = ResponseError.builder()
                 .codigoHttp(404)

@@ -65,6 +65,12 @@ public class Pedido {
     @OneToOne(mappedBy = "pedido", fetch = FetchType.LAZY)
     private Venta venta;
 
+    public void calcularPagoTotal(){
+        this.pagoTotal = this.getDetalles().stream()
+                .map(DetallePedido::getPagoSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     public void addDetalle(DetallePedido detalle) {
         detalles.add(detalle);
         detalle.setPedido(this);

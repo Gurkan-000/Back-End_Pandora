@@ -13,6 +13,7 @@ import com.example.tiendaPandora.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,6 +50,11 @@ public class CarritoService {
         carrito.addUsuario(usuario);
 
         carritoRepository.save(carrito);
+    }
+
+    public void vaciarCarrito(Carrito carrito){
+        carrito.getDetalles().clear();
+        carrito.setPrecioTotal(BigDecimal.ZERO);
     }
 
 }
