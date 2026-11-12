@@ -44,9 +44,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable()
-//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                        .csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler())
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
@@ -71,7 +71,7 @@ public class SecurityConfig {
                                 "/api/variante-producto",
                                 "/api/imagen/**"
                         ).hasRole("ADMIN")
-                        .requestMatchers("/api/carrito/**").hasRole("CLIENTE")
+                        .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE","ADMIN")
                         .requestMatchers("/api/pasarela-pago/comprar").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.GET, "/api/pedido/**").hasAnyRole("CLIENTE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/pedido/**").hasRole("CLIENTE")

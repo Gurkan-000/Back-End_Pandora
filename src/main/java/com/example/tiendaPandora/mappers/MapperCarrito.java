@@ -18,5 +18,15 @@ public class MapperCarrito {
                 .detallesCarrito(detalles)
                 .build();
     }
+
+    public static ResponseCarrito toResponse(Carrito carrito) {
+        return ResponseCarrito.builder()
+                .idCarrito(carrito.getIdCarrito())
+                .idUsuario(carrito.getUsuario().getIdUsuario())
+                .cantidadProductos(carrito.getDetalles().size())
+                .precioTotal(carrito.getPrecioTotal())
+                .build();
+    }
+
 }
 

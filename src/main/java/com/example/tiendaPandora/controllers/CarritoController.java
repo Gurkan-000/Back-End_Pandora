@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,22 +24,46 @@ public class CarritoController {
     private final CarritoService carritoService;
     private final DetalleCarritoService detalleCarritoService;
 
-    @GetMapping("/{correo}")
-    public ResponseEntity<ResponseCarrito> obtenerCarrito(@PathVariable String correo) {
-        ResponseCarrito responseCarrito = carritoService.buscarCarrito(correo);
-        return ResponseEntity.ok(responseCarrito);
+    @GetMapping("/listar")
+    public ResponseEntity<List<ResponseCarrito>> listarCarritos() {
+
+        return ResponseEntity.ok(carritoService.listar());
     }
 
-    @PostMapping("/{correo}/agregar-detalle/{idVarianteProducto}")
-    public ResponseEntity<Void> agregarDetalleCarrito(@PathVariable String correo, @PathVariable UUID idVarianteProducto, @Valid @RequestBody RequestDetalleCarrito detalleCarrito){
-        detalleCarritoService.agregarCarrito(correo, idVarianteProducto, detalleCarrito);
+    @GetMapping("/{idCarrito}/detalles")
+    public ResponseEntity<List<ResponseDetalleCarrito>> listarDetalles(@PathVariable UUID idCarrito) {
+        return ResponseEntity.ok(
+                detalleCarritoService.listarPorCarrito(idCarrito));
+    }
+
+    @GetMapping("/mi-carrito")
+    public ResponseEntity<ResponseCarrito> obtenerMiCarrito(@AuthenticationPrincipal UserDetails usuario) {
+
+        return ResponseEntity.ok(carritoService.buscarMiCarrito(usuario));
+    }
+
+    @PostMapping("/agregar-detalle/{idVarianteProducto}")
+    public ResponseEntity<Void> agregarDetalleCarrito(@AuthenticationPrincipal UserDetails usuario, @PathVariable UUID idVarianteProducto, @Valid @RequestBody RequestDetalleCarrito detalleCarrito){
+        detalleCarritoService.agregarCarrito(usuario, idVarianteProducto, detalleCarrito);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/quitar-detalle/{idDetalleCarrito}")
-    public ResponseEntity<Void> quitarDetalleCarrito(@PathVariable UUID idDetalleCarrito){
-        detalleCarritoService.quitarDetalleCarrito(idDetalleCarrito);
+    public ResponseEntity<Void> quitarDetalleCarrito(@PathVariable UUID idDetalleCarrito,
+                                                     @AuthenticationPrincipal UserDetails usuario){
+
+        detalleCarritoService.quitarDetalleCarrito(idDetalleCarrito, usuario);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @DeleteMapping("/vaciar/{idCarrito}")
+    public ResponseEntity<Void> vaciarCarrito(
+            @PathVariable UUID idCarrito,
+            @AuthenticationPrincipal UserDetails usuario) {
+
+        carritoService.vaciarCarrito(idCarrito, usuario);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
