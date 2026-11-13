@@ -2,6 +2,7 @@ package com.example.tiendaPandora.controllers;
 
 import com.example.tiendaPandora.dtos.request.RequestPedido;
 import com.example.tiendaPandora.dtos.response.ResponseDetallePedido;
+import com.example.tiendaPandora.dtos.response.ResponseInfoPedido;
 import com.example.tiendaPandora.dtos.response.ResponsePedido;
 import com.example.tiendaPandora.services.PedidoService;
 import jakarta.validation.Valid;
@@ -39,10 +40,10 @@ public class PedidoController {
     }
 
     @GetMapping("/listar/{idPedido}/detalles")
-    public ResponseEntity<List<ResponseDetallePedido>> listarDetallePorPedido(@PathVariable UUID idPedido,
-                                                                              @AuthenticationPrincipal UserDetails usuario) {
+    public ResponseEntity<ResponseInfoPedido> listarDetallePorPedido(@PathVariable UUID idPedido,
+                                                                           @AuthenticationPrincipal UserDetails usuario) {
 
-        List<ResponseDetallePedido> response = pedidoService.listarDetallePorPedido(idPedido, usuario);
+        ResponseInfoPedido response = pedidoService.listarDetallePorPedido(idPedido, usuario);
 
         return ResponseEntity.ok(response);
     }

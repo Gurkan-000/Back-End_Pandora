@@ -1,6 +1,7 @@
 package com.example.tiendaPandora.entities;
 
 import com.example.tiendaPandora.entities.enums.EstadoPedido;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -30,7 +31,17 @@ public class Pedido {
     private EstadoPedido estadoPedido = EstadoPedido.PENDIENTE;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "dd-MM-yy HH:mm")
     private LocalDateTime fechaPedido;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String informacionAdicional;
+
+    @Column(length = 40, nullable = false)
+    private String departamentoEntrega;
+
+    @Column(length = 40, nullable = false)
+    private String distritoEntrega;
 
     @Column(length = 255, nullable = false)
     private String direccionEntrega;

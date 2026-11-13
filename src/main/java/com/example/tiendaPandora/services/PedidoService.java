@@ -2,6 +2,7 @@ package com.example.tiendaPandora.services;
 
 import com.example.tiendaPandora.dtos.request.RequestPedido;
 import com.example.tiendaPandora.dtos.response.ResponseDetallePedido;
+import com.example.tiendaPandora.dtos.response.ResponseInfoPedido;
 import com.example.tiendaPandora.dtos.response.ResponsePedido;
 import com.example.tiendaPandora.entities.*;
 import com.example.tiendaPandora.entities.enums.EstadoPedido;
@@ -59,7 +60,7 @@ public class PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseDetallePedido> listarDetallePorPedido(UUID idPedido, UserDetails usuario) {
+    public ResponseInfoPedido listarDetallePorPedido(UUID idPedido, UserDetails usuario) {
 
         Usuario usuarioAutenticado = (Usuario) usuario;
         Pedido pedido = buscarPedido(idPedido);
@@ -69,10 +70,11 @@ public class PedidoService {
             throw new AccessDeniedException("Usuario no permitido");
         }
 
-        return detallePedidoRepository.findByPedido_IdPedido(idPedido)
-                .stream()
+        List<ResponseDetallePedido> detalles = pedido.getDetalles().stream()
                 .map(MapperDetallePedido::toResponse)
                 .toList();
+
+        return MapperPedido.toResponse(pedido, detalles);
     }
 
     @Transactional

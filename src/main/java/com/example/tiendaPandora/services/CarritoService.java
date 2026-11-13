@@ -3,6 +3,7 @@ package com.example.tiendaPandora.services;
 
 import com.example.tiendaPandora.dtos.response.ResponseCarrito;
 import com.example.tiendaPandora.dtos.response.ResponseDetalleCarrito;
+import com.example.tiendaPandora.dtos.response.ResponseERPCarrito;
 import com.example.tiendaPandora.entities.Carrito;
 import com.example.tiendaPandora.entities.DetalleCarrito;
 import com.example.tiendaPandora.entities.Usuario;
@@ -10,6 +11,7 @@ import com.example.tiendaPandora.entities.enums.Rol;
 import com.example.tiendaPandora.exceptions.EntidadNoEncontradaException;
 import com.example.tiendaPandora.mappers.MapperCarrito;
 import com.example.tiendaPandora.mappers.MapperDetalleCarrito;
+import com.example.tiendaPandora.mappers.MapperERPCarrito;
 import com.example.tiendaPandora.repositories.CarritoRepository;
 import com.example.tiendaPandora.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +52,10 @@ public class CarritoService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public List<ResponseCarrito> listar() {
+    public List<ResponseERPCarrito> listar() {
         return carritoRepository.findAll()
                 .stream()
-                .map(MapperCarrito::toResponse)
+                .map(MapperERPCarrito::toResponse)
                 .toList();
     }
 

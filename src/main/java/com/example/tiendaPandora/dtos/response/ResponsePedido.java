@@ -1,6 +1,7 @@
 package com.example.tiendaPandora.dtos.response;
 
 import com.example.tiendaPandora.entities.enums.EstadoPedido;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -23,9 +24,8 @@ public class ResponsePedido {
 
     private EstadoPedido estadoPedido;
 
+    @JsonFormat(pattern = "dd-MM-yy HH:mm")
     private LocalDateTime fechaPedido;
-
-    private String direccionEntrega;
 
     private BigDecimal pagoTotal;
 

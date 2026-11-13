@@ -3,6 +3,7 @@ package com.example.tiendaPandora.controllers;
 import com.example.tiendaPandora.dtos.request.RequestDetalleCarrito;
 import com.example.tiendaPandora.dtos.response.ResponseCarrito;
 import com.example.tiendaPandora.dtos.response.ResponseDetalleCarrito;
+import com.example.tiendaPandora.dtos.response.ResponseERPCarrito;
 import com.example.tiendaPandora.services.CarritoService;
 import com.example.tiendaPandora.services.DetalleCarritoService;
 import jakarta.validation.Valid;
@@ -25,8 +26,7 @@ public class CarritoController {
     private final DetalleCarritoService detalleCarritoService;
 
     @GetMapping("/listar")
-    public ResponseEntity<List<ResponseCarrito>> listarCarritos() {
-
+    public ResponseEntity<List<ResponseERPCarrito>> listarCarritos() {
         return ResponseEntity.ok(carritoService.listar());
     }
 
