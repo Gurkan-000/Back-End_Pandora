@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 "/api/variante-producto",
                                 "/api/imagen/**"
                         ).hasRole("ADMIN")
+                        .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
                         .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE","ADMIN")
                         .requestMatchers("/api/pasarela-pago/comprar").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.GET, "/api/pedido/**").hasAnyRole("CLIENTE", "ADMIN")

@@ -24,7 +24,7 @@ public class Producto {
     private UUID idProducto;
 
 
-    @Column(length = 60, nullable = false, unique = true)
+    @Column(length = 60, nullable = false)
     private String nombreProducto;
 
     @Column(columnDefinition = "TEXT", nullable = false)

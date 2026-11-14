@@ -8,8 +8,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
@@ -38,6 +40,28 @@ public class GlobalException {
                 .build();
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseError);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ResponseError> manejarTipoInvalido(MethodArgumentTypeMismatchException ex) {
+        String mensaje = "El parámetro '" + ex.getName() + "' tiene un valor inválido: '" + ex.getValue() + "'. Formato esperado: yyyy-MM-dd";
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(400)
+                .mensaje(mensaje)
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ResponseError> manejarParametroFaltante(MissingServletRequestParameterException ex) {
+        String mensaje = "Falta el parámetro obligatorio '" + ex.getParameterName() + "'";
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(400)
+                .mensaje(mensaje)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
