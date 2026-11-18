@@ -2,6 +2,7 @@ package com.example.tiendaPandora.exceptions;
 
 import com.example.tiendaPandora.dtos.response.ResponseError;
 import com.example.tiendaPandora.dtos.response.ResponseErrorCampos;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -29,6 +30,35 @@ public class GlobalException {
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseError);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ResponseError> DataIntegrityViolationException(
+            DataIntegrityViolationException e) {
+
+        String mensaje = "Error de integridad de datos.";
+
+        String causa = e.getMostSpecificCause().getMessage();
+
+        if (causa != null) {
+
+            if (causa.contains("Duplicate entry")) {
+                mensaje = "El registro ya existe. No se permiten valores duplicados.";
+
+            } else if (causa.contains("cannot be null")) {
+                mensaje = "Uno o más campos obligatorios no pueden ser nulos.";
+
+            } else if (causa.contains("foreign key constraint fails")) {
+                mensaje = "No se puede eliminar o modificar el registro porque tiene información relacionada.";
+            }
+        }
+
+        ResponseError responseError = ResponseError.builder()
+                .codigoHttp(409)
+                .mensaje(mensaje)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseError);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
