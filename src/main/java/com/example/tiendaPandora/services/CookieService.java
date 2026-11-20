@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.WebUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 
 @Service
 public class CookieService {
@@ -15,23 +17,26 @@ public class CookieService {
     }
 
     public void addHttpOnlyCookie(String name, String value, int maxAge, HttpServletResponse response) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setMaxAge(maxAge);
-        cookie.setPath("/");
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(maxAge)
+                .build();
 
-        response.addCookie(cookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void deleteCookie(String name, HttpServletResponse response) {
-        Cookie cookie = new Cookie(name, null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
+        ResponseCookie cookie = ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
 
-        response.addCookie(cookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
-
 }

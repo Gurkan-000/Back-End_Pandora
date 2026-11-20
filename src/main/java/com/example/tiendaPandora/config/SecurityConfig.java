@@ -104,9 +104,14 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:4200")
+                List.of(
+                        "http://localhost:4200",
+                        "https://front-end-pandora.nickrodri2005.workers.dev"
+                )
         );
+
         configuration.setAllowCredentials(true);
+
         configuration.setAllowedMethods(
                 Arrays.asList(
                         "GET",
@@ -117,6 +122,7 @@ public class SecurityConfig {
                         "PATCH"
                 )
         );
+
         configuration.setAllowedHeaders(
                 Arrays.asList(
                         "Content-Type",
@@ -124,10 +130,12 @@ public class SecurityConfig {
                         "X-XSRF-TOKEN"
                 )
         );
+
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 
