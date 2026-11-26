@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
@@ -21,15 +24,23 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalException {
 
+    private static final Logger log =
+        LoggerFactory.getLogger(GlobalException.class);
+
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseError> exception(Exception e){
+    public ResponseEntity<ResponseError> exception(Exception e) {
+
+        log.error("Error interno del servidor", e);
 
         ResponseError responseError = ResponseError.builder()
                 .codigoHttp(500)
-                .mensaje(e.getMessage())
+                .mensaje("Error interno del servidor.")
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseError);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(responseError);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -27,25 +29,50 @@ public class PayPalClient {
                 .build();
     }
 
+    private final ObjectMapper objectMapper;
+
+    public PayPalClient(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    private JsonNode convertirRespuesta(String json) {
+
+        if (json == null || json.isBlank()) {
+            throw new IllegalStateException(
+                "PayPal devolvió una respuesta vacía"
+            );
+        }
+
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(
+                "No se pudo interpretar la respuesta JSON de PayPal",
+                e
+            );
+        }
+    }
+
     private String obtenerAccessToken() {
 
-        JsonNode response = client()
+        String json = client()
                 .post()
                 .uri("/v1/oauth2/token")
                 .headers(headers -> {
                     headers.setBasicAuth(clientId, clientSecret);
                     headers.setContentType(
-                            MediaType.APPLICATION_FORM_URLENCODED
+                        MediaType.APPLICATION_FORM_URLENCODED
                     );
                 })
                 .body("grant_type=client_credentials")
                 .retrieve()
-                .body(JsonNode.class);
+                .body(String.class);
 
-        if (response == null ||
-                !response.hasNonNull("access_token")) {
+        JsonNode response = convertirRespuesta(json);
+
+        if (!response.hasNonNull("access_token")) {
             throw new IllegalStateException(
-                    "No se pudo autenticar con PayPal"
+                "PayPal no devolvió un access_token"
             );
         }
 
@@ -75,15 +102,17 @@ public class PayPalClient {
                 "purchase_units", List.of(purchaseUnit)
         );
 
-        return client()
-                .post()
-                .uri("/v2/checkout/orders")
-                .header("Authorization", "Bearer " + token)
-                .header("PayPal-Request-Id", idPedido + "-create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(body)
-                .retrieve()
-                .body(JsonNode.class);
+        String json = client()
+                        .post()
+                        .uri("/v2/checkout/orders")
+                        .header("Authorization", "Bearer " + token)
+                        .header("PayPal-Request-Id", idPedido + "-create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(body)
+                        .retrieve()
+                        .body(String.class);
+
+        return convertirRespuesta(json);
     }
 
     public JsonNode capturarOrden(
@@ -93,15 +122,16 @@ public class PayPalClient {
 
         String token = obtenerAccessToken();
 
-        return client()
-                .post()
-                .uri("/v2/checkout/orders/{id}/capture",
-                        idOrdenPayPal)
-                .header("Authorization", "Bearer " + token)
-                .header("PayPal-Request-Id", idPedido + "-capture")
-                .contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(JsonNode.class);
+        String json = client()
+                        .post()
+                        .uri("/v2/checkout/orders/{id}/capture", idOrdenPayPal)
+                        .header("Authorization", "Bearer " + token)
+                        .header("PayPal-Request-Id", idPedido + "-capture")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .retrieve()
+                        .body(String.class);
+
+        return convertirRespuesta(json);
     }
 
 }
