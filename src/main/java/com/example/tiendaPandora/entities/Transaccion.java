@@ -1,3 +1,4 @@
+
 package com.example.tiendaPandora.entities;
 
 import com.example.tiendaPandora.entities.enums.EstadoTransaccion;
@@ -35,19 +36,17 @@ public class Transaccion {
     @Column(length = 255)
     private String referenciaPago;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "id_pedido",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_transaccion_pedido")
-    )
-
     @Column(length = 100, unique = true)
     private String idOrdenPayPal;
 
     @Column(length = 100)
     private String idCapturaPayPal;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "id_pedido",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_transaccion_pedido")
+    )
     private Pedido pedido;
-
 }
