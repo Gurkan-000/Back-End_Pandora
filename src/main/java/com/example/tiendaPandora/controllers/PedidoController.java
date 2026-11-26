@@ -47,7 +47,8 @@ public class PedidoController {
 
         return ResponseEntity.ok(response);
     }
-
+    
+    /*
     @PostMapping("/crear")
     public ResponseEntity<ResponsePedido> crear(
             @AuthenticationPrincipal UserDetails usuario,
@@ -56,7 +57,7 @@ public class PedidoController {
         ResponsePedido response = pedidoService.crear(usuario.getUsername(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+    } */
 
     @PatchMapping("/enviar/{idPedido}")
     public ResponseEntity<Void> enviar(@PathVariable UUID idPedido) {

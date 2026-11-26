@@ -84,7 +84,7 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
                         .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
                         .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE","ADMIN")
-                        .requestMatchers("/api/pasarela-pago/comprar").hasRole("CLIENTE")
+                        .requestMatchers("/api/pasarela-pago/paypal/**").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.GET, "/api/pedido/**").hasAnyRole("CLIENTE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/pedido/**").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.PATCH, "/api/pedido/enviar/**").hasRole("ADMIN")

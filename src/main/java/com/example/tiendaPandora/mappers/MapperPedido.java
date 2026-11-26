@@ -26,7 +26,10 @@ public class MapperPedido {
         return ResponsePedido.builder()
                 .idPedido(pedido.getIdPedido())
                 .idUsuario(pedido.getUsuario().getIdUsuario())
-                .idVenta(pedido.getVenta().getIdVenta())
+                .idVenta(
+                    pedido.getVenta() != null
+                        ? pedido.getVenta().getIdVenta()
+                        : null)
                 .estadoPedido(pedido.getEstadoPedido())
                 .fechaPedido(pedido.getFechaPedido())
                 .pagoTotal(pedido.getPagoTotal())

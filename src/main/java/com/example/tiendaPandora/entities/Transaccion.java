@@ -41,6 +41,13 @@ public class Transaccion {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_transaccion_pedido")
     )
+
+    @Column(length = 100, unique = true)
+    private String idOrdenPayPal;
+
+    @Column(length = 100)
+    private String idCapturaPayPal;
+
     private Pedido pedido;
 
 }
