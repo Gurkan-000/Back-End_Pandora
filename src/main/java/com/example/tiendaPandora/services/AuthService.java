@@ -97,9 +97,9 @@ public class AuthService {
             carritoService.crear(usuario);
         }
 
-        emailService.enviarCorreoVerificacion(
-                requestRegister.getCorreo()
-        );
+//        emailService.enviarCorreoVerificacion(
+//                requestRegister.getCorreo()
+//        );
 
     }
 
