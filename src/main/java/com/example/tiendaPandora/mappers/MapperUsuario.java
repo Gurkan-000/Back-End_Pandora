@@ -14,7 +14,7 @@ public class MapperUsuario {
                 .correo(requestRegister.getCorreo())
                 .contrasena(contrasenaEncriptada)
                 .rol(Rol.CLIENTE)
-                .correoVerificado(false)
+                .correoVerificado(true)
                 .build();
     }
 
