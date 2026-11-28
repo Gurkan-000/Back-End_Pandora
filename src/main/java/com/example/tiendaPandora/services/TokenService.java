@@ -124,4 +124,11 @@ public class TokenService {
 
         return tokenEntity;
     }
+
+    public void limpiarTokens() {
+        tokenRepository.eliminarTokensRevocados_o_Expirados(
+                LocalDateTime.now()
+        );
+    }
+
 }
